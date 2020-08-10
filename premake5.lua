@@ -8,6 +8,9 @@ workspace "RayTracer"
 	}
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["glm"] = "RayTracer/lib/glm"
+
 project "RayTracer"
 	location "RayTracer"
 	kind "SharedLib"
@@ -28,6 +31,10 @@ project "RayTracer"
 		"%{prj.name}/src/**.cpp"
 	}
 
+	includedirs
+	{
+		"%{IncludeDir.glm}"
+	}
 
 project "TestProgram"
 	location "TestProgram"
@@ -42,6 +49,11 @@ project "TestProgram"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"%{IncludeDir.glm}"
 	}
 
 	links
