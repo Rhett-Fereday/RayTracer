@@ -10,6 +10,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["glm"] = "RayTracer/lib/glm"
+IncludeDir["CImg"] = "RayTracer/lib/CImg"
 
 project "RayTracer"
 	location "RayTracer"
@@ -33,7 +34,8 @@ project "RayTracer"
 
 	includedirs
 	{
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.CImg}"
 	}
 
 project "TestProgram"
@@ -53,10 +55,12 @@ project "TestProgram"
 
 	includedirs
 	{
-		"%{IncludeDir.glm}"
+		"RayTracer/src",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.CImg}"
 	}
 
 	links
 	{
-		"RayTracer"
+		"RayTracer.dll"
 	}
