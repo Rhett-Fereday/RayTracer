@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RayTracer", "RayTracer\RayTracer.vcxproj", "{123F68F5-7EA9-1C6C-C7E7-CD113391FAC0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestProgram", "TestProgram\TestProgram.vcxproj", "{7DDDEDC7-E992-66BD-7287-6094DE3B5DC1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{123F68F5-7EA9-1C6C-C7E7-CD113391FAC0}.Debug|x64.ActiveCfg = Debug|x64
+		{123F68F5-7EA9-1C6C-C7E7-CD113391FAC0}.Debug|x64.Build.0 = Debug|x64
+		{123F68F5-7EA9-1C6C-C7E7-CD113391FAC0}.Release|x64.ActiveCfg = Release|x64
+		{123F68F5-7EA9-1C6C-C7E7-CD113391FAC0}.Release|x64.Build.0 = Release|x64
+		{7DDDEDC7-E992-66BD-7287-6094DE3B5DC1}.Debug|x64.ActiveCfg = Debug|x64
+		{7DDDEDC7-E992-66BD-7287-6094DE3B5DC1}.Debug|x64.Build.0 = Debug|x64
+		{7DDDEDC7-E992-66BD-7287-6094DE3B5DC1}.Release|x64.ActiveCfg = Release|x64
+		{7DDDEDC7-E992-66BD-7287-6094DE3B5DC1}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
