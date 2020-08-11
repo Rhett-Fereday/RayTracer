@@ -4,10 +4,11 @@
 
 #include "Camera.h"
 #include "Sphere.h"
+#include "Core.h"
 
 namespace RayTracer
 {
-	class Scene
+	class RT_API Scene
 	{
 	public:
 		Scene(Camera camera);

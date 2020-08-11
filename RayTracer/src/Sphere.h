@@ -1,15 +1,19 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "Core.h"
+#include "HitInfo.h"
 
 namespace RayTracer
 {
-	class Sphere
+	class RT_API Sphere
 	{
 	public:
-		Sphere(float radius, glm::vec3 albedo);
+		Sphere(glm::mat4 transform, float radius, glm::vec3 albedo);
+		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
 
 	private:
+		glm::mat4 m_transform;
 		float m_radius;
 		glm::vec3 m_albedo;
 	};

@@ -2,10 +2,11 @@
 
 #include "glm/glm.hpp"
 #include "CImg.h"
+#include "Core.h"
 
 namespace RayTracer
 {
-	class Camera
+	class RT_API Camera
 	{
 	friend class Scene;
 

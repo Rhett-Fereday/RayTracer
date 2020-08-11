@@ -26,6 +26,11 @@ project "RayTracer"
 		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestProgram")
 	}
 
+	defines
+	{
+		"RT_BUILD_DLL"
+	}
+
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -62,5 +67,5 @@ project "TestProgram"
 
 	links
 	{
-		"RayTracer.dll"
+		"RayTracer"
 	}
