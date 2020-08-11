@@ -13,6 +13,7 @@ namespace RayTracer
 		Scene(Camera camera);
 		void AddSphere(Sphere sphere);
 		void RenderScene();
+		void SaveScene(const char* filename);
 
 	private:
 		Camera m_camera;

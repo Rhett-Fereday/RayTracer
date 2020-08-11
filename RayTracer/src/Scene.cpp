@@ -14,5 +14,11 @@ namespace RayTracer
 
 	void Scene::RenderScene()
 	{
+		m_camera.Render();
+	}
+	
+	void Scene::SaveScene(const char* filename)
+	{
+		m_camera.GetRenderTarget().save(filename);
 	}
 }
