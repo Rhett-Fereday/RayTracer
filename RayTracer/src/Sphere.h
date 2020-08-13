@@ -10,7 +10,7 @@ namespace RayTracer
 	{
 	public:
 		Sphere(glm::mat4 transform, float radius, glm::vec3 albedo);
-		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
+		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo, glm::mat4 cameraTransform);
 
 	private:
 		glm::mat4 m_transform;

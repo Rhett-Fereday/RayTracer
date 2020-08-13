@@ -6,7 +6,7 @@ namespace RayTracer
     {
     }
 
-    bool Sphere::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
+    bool Sphere::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo, glm::mat4 cameraTransform)
     {
         glm::vec4 centerPos = m_transform * glm::vec4(0, 0, 0, 1);
         glm::vec3 center = glm::vec3(centerPos.x, centerPos.y, centerPos.z);
@@ -29,8 +29,7 @@ namespace RayTracer
         if (u1 < 0.0001) return false;
 
         hitInfo.hitPosition = rayOrigin + rayDirection * u1;
-        hitInfo.hitNormal = hitInfo.hitPosition - center;
-        hitInfo.hitNormal = normalize(hitInfo.hitNormal);
+        hitInfo.hitNormal = glm::normalize(hitInfo.hitPosition - center);
         hitInfo.hitColor = m_albedo;
 
         return true;
