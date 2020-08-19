@@ -9,5 +9,6 @@ namespace RayTracer
 		glm::vec3 hitPosition;
 		glm::vec3 hitNormal;
 		glm::vec3 hitColor;
+		float hitDistance;
 	};
 }

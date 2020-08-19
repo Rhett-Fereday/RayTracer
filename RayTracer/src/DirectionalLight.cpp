@@ -9,11 +9,11 @@ namespace RayTracer
 		m_direction = glm::normalize(direction);
 	}
 
-	glm::vec3 DirectionalLight::illumination(const glm::vec3& point, const glm::vec3& normal, const glm::vec3& ray)
+	glm::vec3 DirectionalLight::Illumination(const glm::vec3& point, const glm::vec3& normal, const glm::vec3& ray)
 	{
 		glm::vec3 returnIntensity = { 0,0,0 };
 
-		float incidence = std::max(0.0f, glm::dot(normal, m_direction));
+		float incidence = std::max(0.0f, glm::dot(normal, -m_direction));
 
 		if (incidence > 0.0f)
 		{
@@ -21,5 +21,10 @@ namespace RayTracer
 		}
 
 		return returnIntensity;
+	}
+
+	glm::vec3 DirectionalLight::DirectionToLight(const glm::vec3& point)
+	{
+		return glm::normalize(-m_direction);
 	}
 }
