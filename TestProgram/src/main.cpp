@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-	RayTracer::Camera camera = RayTracer::Camera();
+	RayTracer::Camera camera = RayTracer::Camera(3840,2160);
 	RayTracer::Scene scene(camera);
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0, -5));

@@ -1,7 +1,6 @@
 *.sln
 *.vcxproj
 *.user
-*.ppm
 .vs
 /bin
 /bin-int
