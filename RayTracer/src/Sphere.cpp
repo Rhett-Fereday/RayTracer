@@ -47,7 +47,7 @@ namespace RayTracer
         float u = 1 - (phi + 3.14) / (2 * 3.14);
         float v = (theta + 3.14 / 2) / 3.14;
 
-        hitInfo.hitColor = m_material.GetAlbedo({ u,v });
+		hitInfo.hitColor = m_material.GetAlbedo(u, v);
 
         return true;
     }

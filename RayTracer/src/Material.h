@@ -3,6 +3,7 @@
 #include "CImg.h"
 #include "Core.h"
 #include "glm/glm.hpp"
+#include "Texture.h"
 
 namespace RayTracer
 {
@@ -10,9 +11,11 @@ namespace RayTracer
 	{
 	public:
 		Material(const char* textureFile);
-		glm::vec3 GetAlbedo(glm::vec2 uv);
+		glm::vec3 GetAlbedo(float u, float v);
+		void SetAlbedoTexture(const char* textureFile);
 
 	private:
-		cimg_library::CImg<unsigned char> m_texture;
+		Texture* m_albedoTexture;
+		//Texture* m_normalTexture;
 	};
 }
