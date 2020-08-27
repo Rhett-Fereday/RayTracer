@@ -17,7 +17,7 @@ namespace RayTracer
 		glm::mat4 m_transform;
 		glm::mat4 m_inverseTransform;
 		float m_radius;
-		glm::vec3 m_albedo;
+		glm::vec3 m_center, m_albedo;
 		Material m_material;
 	};
 }

@@ -7,16 +7,15 @@ namespace RayTracer
     Sphere::Sphere(glm::mat4 transform, float radius, Material material) : m_transform(transform), m_radius(radius), m_material(material)
     {
         m_inverseTransform = glm::inverse(m_transform);
+        glm::vec4 temp = m_transform * glm::vec4(0, 0, 0, 1);
+        m_center = glm::vec3(temp.x, temp.y, temp.z);
     }
 
     bool Sphere::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
     {
-        glm::vec4 centerPos = m_transform * glm::vec4(0, 0, 0, 1);
-        glm::vec3 center = glm::vec3(centerPos.x, centerPos.y, centerPos.z);
-
         float a = dot(rayDirection, rayDirection);
-        float b = dot(2.0f * rayDirection, (rayOrigin - center));
-        float c = dot(rayOrigin - center, rayOrigin - center) - (m_radius * m_radius);
+        float b = dot(2.0f * rayDirection, (rayOrigin - m_center));
+        float c = dot(rayOrigin - m_center, rayOrigin - m_center) - (m_radius * m_radius);
 
         float radicand = b * b - 4 * a * c;
 
@@ -33,7 +32,7 @@ namespace RayTracer
         if (u1 < 0.0001) return false;
 
         hitInfo.hitPosition = rayOrigin + rayDirection * u1;
-        hitInfo.hitNormal = glm::normalize(hitInfo.hitPosition - center);
+        hitInfo.hitNormal = glm::normalize(hitInfo.hitPosition - m_center);
         hitInfo.hitDistance = glm::distance(rayDirection, hitInfo.hitPosition);
 
         glm::vec4 temp = m_inverseTransform * glm::vec4(hitInfo.hitNormal, 0 );
