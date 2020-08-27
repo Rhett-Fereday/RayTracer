@@ -4,13 +4,13 @@ namespace RayTracer
 {
 	Scene::Scene(Camera camera) : m_camera(camera)
 	{
-		m_spheres = std::vector<Sphere>();
-		m_light = DirectionalLight({ 0,-1,-1 }, { 1,1,1 }, 1.0f);
+		m_objects = std::vector<Object*>();
+		m_light = DirectionalLight({ -1,-1,-1 }, { 1,1,1 }, 1.0f);
 	}
 
-	void Scene::AddSphere(Sphere sphere)
+	void Scene::AddObject(Object* object)
 	{
-		m_spheres.push_back(sphere);
+		m_objects.push_back(object);
 	}
 
 	void Scene::RenderScene()
@@ -40,7 +40,7 @@ namespace RayTracer
 		// An object was hit - determine its occlusion
 		glm::vec3 shadowRay = m_light.DirectionToLight(hitInformation.hitPosition);
 		HitInfo occlusionInformation;
-		bool isOccluded = TestIntersection(hitInformation.hitPosition, shadowRay, occlusionInformation);
+		bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f*hitInformation.hitNormal, shadowRay, occlusionInformation);
 
 		// Object is in shadow
 		if (isOccluded) return intensity;
@@ -48,30 +48,30 @@ namespace RayTracer
 		// Calculate illumination at the object collision point
 		intensity += m_light.Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
 
-		return hitInformation.hitColor * intensity;
+		return hitInformation.hitColor*intensity;
 	}
 
 	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)
 	{
-		Sphere* hitSphere = nullptr;
+		Object* hitObject = nullptr;
 		float closest = INFINITY;
 
 		HitInfo tempInfo;
 
-		for (int i = 0; i < m_spheres.size(); i++)
+		for (int i = 0; i < m_objects.size(); i++)
 		{
-			if (m_spheres[i].Intersects(rayOrigin, ray, tempInfo))
+			if (m_objects[i]->Intersects(rayOrigin, ray, tempInfo))
 			{
 				if (tempInfo.hitDistance < closest)
 				{
 					closest = tempInfo.hitDistance;
 					hitInformation = tempInfo;
-					hitSphere = &m_spheres[i];
+					hitObject = m_objects[i];
 				}
 			}
 		}
 
-		if (hitSphere == nullptr) return false;
+		if (hitObject == nullptr) return false;
 
 		return true;
 	}

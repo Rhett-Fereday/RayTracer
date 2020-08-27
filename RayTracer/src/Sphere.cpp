@@ -4,16 +4,15 @@
 
 namespace RayTracer
 {
-    Sphere::Sphere(glm::mat4 transform, float radius, Material material) : m_transform(transform), m_radius(radius), m_material(material)
+    Sphere::Sphere(glm::mat4 transform, ConstMaterial* material, float radius) : Object(transform, material),  m_radius(radius)
     {
-        m_inverseTransform = glm::inverse(m_transform);
         glm::vec4 temp = m_transform * glm::vec4(0, 0, 0, 1);
         m_center = glm::vec3(temp.x, temp.y, temp.z);
     }
 
     bool Sphere::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
     {
-        float a = dot(rayDirection, rayDirection);
+        float a = 1.0f;//dot(rayDirection, rayDirection);
         float b = dot(2.0f * rayDirection, (rayOrigin - m_center));
         float c = dot(rayOrigin - m_center, rayOrigin - m_center) - (m_radius * m_radius);
 
@@ -23,8 +22,9 @@ namespace RayTracer
 
         float u1, u2;
         glm::vec3 intersect1, intersect2;
-        u1 = (-b + sqrt(radicand)) / (2.0f * a);
-        u2 = (-b - sqrt(radicand)) / (2.0f * a);
+        float root = sqrt(radicand);
+        u1 = (-b + root) / (2.0f * a);
+        u2 = (-b - root) / (2.0f * a);
 
         if (u2 < u1) u1 = u2;
 
@@ -46,7 +46,7 @@ namespace RayTracer
         float u = 1 - (phi + 3.14) / (2 * 3.14);
         float v = (theta + 3.14 / 2) / 3.14;
 
-		hitInfo.hitColor = m_material.GetAlbedo(u, v);
+		hitInfo.hitColor = m_material->albedo;
 
         return true;
     }
