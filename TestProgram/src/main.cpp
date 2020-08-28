@@ -11,12 +11,12 @@ int main(int argc, char* argv[])
 	RayTracer::Camera camera = RayTracer::Camera(1920,1080);
 	RayTracer::Scene scene(camera);
 
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-0.6f, 0, -5));
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0, -4));
 	transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(1, 0, 0));
 
 	RayTracer::ConstMaterial redMat, blueMat, greenMat, whiteMat;
-	redMat.albedo = { 1,0,0 };
-	blueMat.albedo = { 0,0,1 };
+	redMat.albedo = { 1,0,0 }; redMat.reflectiveness = 1.0f;
+	blueMat.albedo = { 0,0,1 }; blueMat.reflectiveness = 0.3f;
 	greenMat.albedo = { 0,1,0 };
 	whiteMat.albedo = { 1,1,1 };
 

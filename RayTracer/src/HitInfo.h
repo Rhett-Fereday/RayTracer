@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "ConstMaterial.h"
 
 namespace RayTracer
 {
@@ -8,7 +9,7 @@ namespace RayTracer
 	{
 		glm::vec3 hitPosition;
 		glm::vec3 hitNormal;
-		glm::vec3 hitColor;
+		ConstMaterial* hitMaterial;
 		float hitDistance;
 	};
 }

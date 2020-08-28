@@ -34,7 +34,7 @@ namespace RayTracer
                 ray = glm::normalize(glm::vec3(temp.x, temp.y, temp.z));
                 glm::vec4 rayOrigin = m_cameraToWorld * glm::vec4(0);
 
-                glm::vec3 color = scene->TraceRay({ rayOrigin.x, rayOrigin.y, rayOrigin.z }, ray, glm::vec3(1.0f), 0);
+                glm::vec3 color = scene->TraceRay({ rayOrigin.x, rayOrigin.y, rayOrigin.z }, ray, glm::vec3(1.0f), 1);
 
                 /*if (color.r > 1 || color.g > 1 || color.b > 1)
                 {

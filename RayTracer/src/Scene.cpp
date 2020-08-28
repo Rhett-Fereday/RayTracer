@@ -6,6 +6,7 @@ namespace RayTracer
 	{
 		m_objects = std::vector<Object*>();
 		m_light = DirectionalLight({ -1,-1,-1 }, { 1,1,1 }, 1.0f);
+		m_recursionLimit = 3;
 	}
 
 	void Scene::AddObject(Object* object)
@@ -29,6 +30,8 @@ namespace RayTracer
 		// Default return value
 		glm::vec3 intensity = glm::vec3(0, 0, 0);
 
+		if (depth > m_recursionLimit) return intensity;
+
 		HitInfo hitInformation;
 
 		// Test whether this ray intersects an object within the scene
@@ -48,7 +51,10 @@ namespace RayTracer
 		// Calculate illumination at the object collision point
 		intensity += m_light.Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
 
-		return hitInformation.hitColor*intensity;
+		glm::vec3 diffuseComponent = hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
+		glm::vec3 reflectionRay = glm::reflect(ray, hitInformation.hitNormal);
+
+		return intensity * (diffuseComponent + (hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1)));
 	}
 
 	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)

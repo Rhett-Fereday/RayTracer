@@ -142,7 +142,7 @@ namespace RayTracer
 				}
 			}
 
-			hitInfo.hitColor = m_material->albedo;
+			hitInfo.hitMaterial = m_material;
 			hitInfo.hitDistance = tMin;
 			hitInfo.hitPosition = rayOrigin + rayDirection * tMin;
 			return true;
