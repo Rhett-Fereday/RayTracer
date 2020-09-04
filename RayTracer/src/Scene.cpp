@@ -46,15 +46,17 @@ namespace RayTracer
 		bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f*hitInformation.hitNormal, shadowRay, occlusionInformation);
 
 		// Object is in shadow
-		if (isOccluded) return intensity;
+		if (isOccluded) return intensity + hitInformation.hitMaterial->emissiveness;
 
 		// Calculate illumination at the object collision point
 		intensity += m_light.Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
 
 		glm::vec3 diffuseComponent = hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
 		glm::vec3 reflectionRay = glm::reflect(ray, hitInformation.hitNormal);
+		glm::vec3 reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+		glm::vec3 emissiveComponent = hitInformation.hitMaterial->emissiveness;
 
-		return intensity * (diffuseComponent + (hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1)));
+		return intensity * (diffuseComponent + reflectionComponent) + emissiveComponent;
 	}
 
 	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)

@@ -4,7 +4,7 @@
 
 namespace RayTracer
 {
-	DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity) : m_color(color), m_intensity(intensity)
+	DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity) : Light(color, intensity)
 	{
 		m_direction = glm::normalize(direction);
 	}

@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	redMat.albedo = { 1,0,0 }; redMat.reflectiveness = 1.0f;
 	blueMat.albedo = { 0,0,1 }; blueMat.reflectiveness = 0.3f;
 	greenMat.albedo = { 0,1,0 };
-	whiteMat.albedo = { 1,1,1 };
+	whiteMat.albedo = { 1,1,1 };// whiteMat.emissiveness = { 1,1,1 };
 
 	RayTracer::Sphere leftSphere = RayTracer::Sphere(transform, &redMat, 0.3f);
 

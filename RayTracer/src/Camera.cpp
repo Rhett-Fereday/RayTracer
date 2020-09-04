@@ -43,10 +43,10 @@ namespace RayTracer
                     color.g = color.g / max;
                     color.b = color.b / max;
                 }*/
-
-                m_renderTarget(x, y, 0, 0) = (unsigned char)(color.r * 255);
-                m_renderTarget(x, y, 0, 1) = (unsigned char)(color.g * 255);
-                m_renderTarget(x, y, 0, 2) = (unsigned char)(color.b * 255);
+                glm::vec3 clampedColor = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
+                m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
+                m_renderTarget(x, y, 0, 1) = (unsigned char)(clampedColor.g * 255);
+                m_renderTarget(x, y, 0, 2) = (unsigned char)(clampedColor.b * 255);
             }
         }
 	}
