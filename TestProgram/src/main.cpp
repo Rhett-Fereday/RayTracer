@@ -5,20 +5,32 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "ConstMaterial.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 int main(int argc, char* argv[])
 {
 	RayTracer::Camera camera = RayTracer::Camera(1920,1080);
 	RayTracer::Scene scene(camera);
 
+	RayTracer::DirectionalLight sunlight = RayTracer::DirectionalLight({ -1,-1,-1 }, { 1,1,1 }, 1.0f);
+	RayTracer::PointLight pointLight = RayTracer::PointLight({ 1,1,1 }, 10.0f, { -0.5f,0,-4 });
+	RayTracer::SpotLight spotLight = RayTracer::SpotLight({ 1,1,1 }, 10.0f, { 0,0,-1 }, { 0,0,-1 }, 15.0f);
+
+	//scene.AddLight(&sunlight);
+	//scene.AddLight(&pointLight);
+	scene.AddLight(&spotLight);
+
+
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0, -4));
 	transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(1, 0, 0));
 
 	RayTracer::ConstMaterial redMat, blueMat, greenMat, whiteMat;
-	redMat.albedo = { 1,0,0 }; redMat.reflectiveness = 1.0f;
-	blueMat.albedo = { 0,0,1 }; blueMat.reflectiveness = 0.3f;
-	greenMat.albedo = { 0,1,0 };
-	whiteMat.albedo = { 1,1,1 };// whiteMat.emissiveness = { 1,1,1 };
+	redMat.albedo = { 1,0,0 }; redMat.reflectiveness = 0.8f;
+	blueMat.albedo = { 0,0,1 }; blueMat.reflectiveness = 0.7f;
+	greenMat.albedo = { 0,1,0 }; greenMat.reflectiveness = 0.0f;
+	whiteMat.albedo = { 1,1,1 }; whiteMat.reflectiveness = 0.0f;
 
 	RayTracer::Sphere leftSphere = RayTracer::Sphere(transform, &redMat, 0.3f);
 

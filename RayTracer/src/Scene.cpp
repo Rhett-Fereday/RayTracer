@@ -5,13 +5,18 @@ namespace RayTracer
 	Scene::Scene(Camera camera) : m_camera(camera)
 	{
 		m_objects = std::vector<Object*>();
-		m_light = DirectionalLight({ -1,-1,-1 }, { 1,1,1 }, 1.0f);
+		m_lights = std::vector<Light*>();
 		m_recursionLimit = 3;
 	}
 
 	void Scene::AddObject(Object* object)
 	{
 		m_objects.push_back(object);
+	}
+
+	void Scene::AddLight(Light* light)
+	{
+		m_lights.push_back(light);
 	}
 
 	void Scene::RenderScene()
@@ -40,23 +45,36 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
-		// An object was hit - determine its occlusion
-		glm::vec3 shadowRay = m_light.DirectionToLight(hitInformation.hitPosition);
-		HitInfo occlusionInformation;
-		bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f*hitInformation.hitNormal, shadowRay, occlusionInformation);
+		for (int i = 0; i < m_lights.size(); i++)
+		{
+			// An object was hit - determine its lighting
+			glm::vec3 shadowRay = m_lights[i]->DirectionToLight(hitInformation.hitPosition);
+			HitInfo occlusionInformation;
+			bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f * shadowRay, shadowRay, occlusionInformation);
 
-		// Object is in shadow
-		if (isOccluded) return intensity + hitInformation.hitMaterial->emissiveness;
+			// Object might be occluded for this light
+			if (isOccluded)
+			{
+				if (occlusionInformation.hitDistance < m_lights[i]->DistanceToLight(hitInformation.hitPosition)) continue;
+			}
 
-		// Calculate illumination at the object collision point
-		intensity += m_light.Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
+			// Calculate illumination for this light at the object collision point
+			intensity += m_lights[i]->Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
+		}
 
-		glm::vec3 diffuseComponent = hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
-		glm::vec3 reflectionRay = glm::reflect(ray, hitInformation.hitNormal);
-		glm::vec3 reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
-		glm::vec3 emissiveComponent = hitInformation.hitMaterial->emissiveness;
+		glm::vec3 clampedIntensity = glm::clamp(intensity, { 0,0,0 }, { 1,1,1 });
 
-		return intensity * (diffuseComponent + reflectionComponent) + emissiveComponent;
+		glm::vec3 diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
+		
+		glm::vec3 reflectionComponent;
+		if (hitInformation.hitMaterial->reflectiveness > 0)
+		{
+			glm::vec3 reflectionRay = glm::reflect(ray, hitInformation.hitNormal);
+			reflectionComponent = clampedIntensity * hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+		}
+		//glm::vec3 emissiveComponent = hitInformation.hitMaterial->emissiveness;
+
+		return glm::clamp(diffuseComponent + reflectionComponent, { 0,0,0 }, { 1,1,1 });
 	}
 
 	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)

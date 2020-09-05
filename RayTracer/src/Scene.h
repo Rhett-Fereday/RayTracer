@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "Object.h"
 #include "Core.h"
-#include "DirectionalLight.h"
+#include "Light.h"
 
 namespace RayTracer
 {
@@ -16,13 +16,14 @@ namespace RayTracer
 	public:
 		Scene(Camera camera);
 		void AddObject(Object* object);
+		void AddLight(Light* light);
 		void RenderScene();
 		void SaveScene(const char* filename);
 
 	private:
 		Camera m_camera;
 		std::vector<Object*> m_objects;
-		DirectionalLight m_light;
+		std::vector<Light*> m_lights;
 		int m_recursionLimit;
 
 		glm::vec3 TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth);

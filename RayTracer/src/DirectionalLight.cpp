@@ -27,4 +27,9 @@ namespace RayTracer
 	{
 		return glm::normalize(-m_direction);
 	}
+
+	float DirectionalLight::DistanceToLight(const glm::vec3 & point)
+	{
+		return 1000000.0f;
+	}
 }

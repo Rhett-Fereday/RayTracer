@@ -13,6 +13,7 @@ namespace RayTracer
 
         glm::vec3 Illumination(const glm::vec3& point, const glm::vec3& normal, const glm::vec3& ray);
         glm::vec3 DirectionToLight(const glm::vec3& point);
+		float DistanceToLight(const glm::vec3 & point);
 
     private:
         glm::vec3 m_direction;
