@@ -6,7 +6,7 @@ namespace RayTracer
 	{
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
-		m_recursionLimit = 3;
+		m_recursionLimit = 5;
 	}
 
 	void Scene::AddObject(Object* object)
@@ -55,7 +55,10 @@ namespace RayTracer
 			// Object might be occluded for this light
 			if (isOccluded)
 			{
-				if (occlusionInformation.hitDistance < m_lights[i]->DistanceToLight(hitInformation.hitPosition)) continue;
+				if (occlusionInformation.hitDistance < m_lights[i]->DistanceToLight(hitInformation.hitPosition))
+				{
+					continue;
+				}
 			}
 
 			// Calculate illumination for this light at the object collision point
@@ -69,8 +72,8 @@ namespace RayTracer
 		glm::vec3 reflectionComponent;
 		if (hitInformation.hitMaterial->reflectiveness > 0)
 		{
-			glm::vec3 reflectionRay = glm::reflect(ray, hitInformation.hitNormal);
-			reflectionComponent = clampedIntensity * hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
+			reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
 		}
 		//glm::vec3 emissiveComponent = hitInformation.hitMaterial->emissiveness;
 

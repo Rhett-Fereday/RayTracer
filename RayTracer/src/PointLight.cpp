@@ -31,6 +31,7 @@ namespace RayTracer
 
 	float PointLight::DistanceToLight(const glm::vec3 & point)
 	{
-		return glm::distance(m_position, point);
+		float dist = glm::distance(m_position, point);
+		return dist;
 	}
 }

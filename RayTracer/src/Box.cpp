@@ -142,6 +142,7 @@ namespace RayTracer
 				}
 			}
 
+			hitInfo.hitNormal = glm::normalize(hitInfo.hitNormal);
 			hitInfo.hitMaterial = m_material;
 			hitInfo.hitDistance = tMin;
 			hitInfo.hitPosition = rayOrigin + rayDirection * tMin;

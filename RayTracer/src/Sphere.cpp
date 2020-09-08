@@ -33,18 +33,18 @@ namespace RayTracer
 
         hitInfo.hitPosition = rayOrigin + rayDirection * u1;
         hitInfo.hitNormal = glm::normalize(hitInfo.hitPosition - m_center);
-        hitInfo.hitDistance = glm::distance(rayDirection, hitInfo.hitPosition);
+		hitInfo.hitDistance = u1;
 
-        glm::vec4 temp = m_inverseTransform * glm::vec4(hitInfo.hitNormal, 0 );
-        glm::vec3 surfacePoint = glm::vec3(temp.x, temp.y, temp.z);
+        /*glm::vec4 temp = m_inverseTransform * glm::vec4(hitInfo.hitNormal, 0 );
+        glm::vec3 surfacePoint = glm::vec3(temp.x, temp.y, temp.z);*/
 
         /*float u = (1 + atan2(surfacePoint.z, surfacePoint.x) / 3.14) * 0.5;
         float v = acosf(surfacePoint.y) / 3.14;*/
 
-        float phi = atan2(surfacePoint.z, surfacePoint.x);
+        /*float phi = atan2(surfacePoint.z, surfacePoint.x);
         float theta = asin(surfacePoint.y);
         float u = 1 - (phi + 3.14) / (2 * 3.14);
-        float v = (theta + 3.14 / 2) / 3.14;
+        float v = (theta + 3.14 / 2) / 3.14;*/
 
 		hitInfo.hitMaterial = m_material;
 
