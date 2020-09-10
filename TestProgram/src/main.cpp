@@ -52,32 +52,32 @@ int main(int argc, char* argv[])
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -4.5));	
 	transform = glm::rotate(transform, glm::radians(15.0f), { 1,0,0 });
 	transform = glm::rotate(transform, glm::radians(45.0f), { 0,1,0 });
-	RayTracer::Box cube = RayTracer::Box(transform, &goldMat, glm::vec3(-0.25, -0.25, -0.25), glm::vec3(0.25, 0.25, 0.25));
+	RayTracer::Box cube = RayTracer::Box(transform, &goldMat, glm::vec3(0.5, 0.5, 0.5));
 
 	scene.AddObject(&cube);
 
 	// Create Room
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.55, -2.3));
-	RayTracer::Box floor = RayTracer::Box(transform, &whiteMat, glm::vec3(-1.5, -0.05, -2.7), glm::vec3(1.5, 0.05, 2.7));
+	RayTracer::Box floor = RayTracer::Box(transform, &whiteMat, glm::vec3(3, 0.1, 5.4));
 
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75f, -2.3));
-	RayTracer::Box ceiling = RayTracer::Box(transform, &whiteMat, glm::vec3(-1.5, -0.05, -2.7), glm::vec3(1.5, 0.05, 2.7));
+	RayTracer::Box ceiling = RayTracer::Box(transform, &whiteMat, glm::vec3(3, 0.1, 5.4));
 
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.2, -5));
 	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(1, 0, 0));
-	RayTracer::Box backWall = RayTracer::Box(transform, &mirrorMat, glm::vec3(-1.5, -0.05, -0.75), glm::vec3(1.5, 0.05, 0.75));
+	RayTracer::Box backWall = RayTracer::Box(transform, &mirrorMat, glm::vec3(3, 0.1, 1.5));
 
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(-1.25, 0.2, -2.3));
 	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0, 0, 1));
-	RayTracer::Box leftWall = RayTracer::Box(transform, &blueMat, glm::vec3(-1.5, -0.05, -2.7), glm::vec3(1.5, 0.05, 2.7));
+	RayTracer::Box leftWall = RayTracer::Box(transform, &blueMat, glm::vec3(3, 0.1, 5.4));
 
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(1.25, 0.2, -2.3));
 	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0, 0, 1));
-	RayTracer::Box rightWall = RayTracer::Box(transform, &redMat, glm::vec3(-1.5, -0.05, -2.7), glm::vec3(1.5, 0.05, 2.7));
+	RayTracer::Box rightWall = RayTracer::Box(transform, &redMat, glm::vec3(3, 0.1, 5.4));
 
 	transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.2, 0.5));
 	transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(1, 0, 0));
-	RayTracer::Box wall = RayTracer::Box(transform, &whiteMat, glm::vec3(-1.5, -0.05, -0.75), glm::vec3(1.5, 0.05, 0.75));
+	RayTracer::Box wall = RayTracer::Box(transform, &whiteMat, glm::vec3(3, 0.1, 1.5));
 
 	scene.AddObject(&floor);
 	scene.AddObject(&ceiling);
