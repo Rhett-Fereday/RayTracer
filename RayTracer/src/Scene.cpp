@@ -69,7 +69,7 @@ namespace RayTracer
 
 		glm::vec3 diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
 		
-		glm::vec3 reflectionComponent;
+		glm::vec3 reflectionComponent = { 0,0,0 };
 		if (hitInformation.hitMaterial->reflectiveness > 0)
 		{
 			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
