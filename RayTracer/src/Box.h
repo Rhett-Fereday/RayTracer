@@ -11,7 +11,7 @@ namespace RayTracer
 	class RT_API Box : public Object
 	{
 	public:
-		Box(glm::mat4 transform, ConstMaterial* material, glm::vec3 minDimensions, glm::vec3 maxDimensions);
+		Box(glm::mat4 transform, ConstMaterial* material, glm::vec3 dimensions);
 		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
 
 	private:
