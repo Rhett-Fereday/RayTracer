@@ -10,9 +10,10 @@ namespace RayTracer
         m_center = glm::vec3(temp.x, temp.y, temp.z);
     }
 
+    // Modified from scratchapixel.com to support my program structure
     bool Sphere::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
     {
-        float a = 1.0f;//dot(rayDirection, rayDirection);
+        float a = 1.0f;//dot(rayDirection, rayDirection); Since it's normalized this is always 1
         float b = dot(2.0f * rayDirection, (rayOrigin - m_center));
         float c = dot(rayOrigin - m_center, rayOrigin - m_center) - (m_radius * m_radius);
 

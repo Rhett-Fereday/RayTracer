@@ -6,6 +6,7 @@
 
 namespace RayTracer
 {
+	// Base object class to allow storing all object types in a single vector
 	class Object
 	{
 	public:

@@ -8,6 +8,7 @@ namespace RayTracer
 	{
 	}
 
+	// Point light illumination is also very easy. Spherical attenuation from scratchapixel.com
 	glm::vec3 PointLight::Illumination(const glm::vec3 & point, const glm::vec3 & normal, const glm::vec3 & ray)
 	{
 		glm::vec3 returnIntensity = { 0,0,0 };

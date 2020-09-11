@@ -15,6 +15,7 @@ namespace RayTracer
         m_cameraToWorld = glm::inverse(m_worldToCamera);
 	}
 	
+    // Cast the camera rays into the scene. Code set up from scratchapixel.com with modifications to support camera transforms
 	void Camera::Render(Scene* scene)
 	{
         float widthInverse = 1 / float(m_width);
@@ -30,20 +31,19 @@ namespace RayTracer
                 float i = (2 * ((x + 0.5f) * widthInverse) - 1) * angle * aspectRatio;
                 float j = (1 - 2 * ((y + 0.5f) * heightInverse)) * angle;
                 glm::vec3 ray(i, j, -1);
+                
+                // Transform the rays from camera space into world space.
                 glm::vec4 temp = glm::normalize(m_cameraToWorld * glm::vec4(ray, 1));
                 ray = glm::normalize(glm::vec3(temp.x, temp.y, temp.z));
                 glm::vec4 rayOrigin = m_cameraToWorld * glm::vec4(0);
 
+                // Cast the ray using the Scene class' recursive TraceRay method
                 glm::vec3 color = scene->TraceRay({ rayOrigin.x, rayOrigin.y, rayOrigin.z }, ray, glm::vec3(1.0f), 1);
 
-                /*if (color.r > 1 || color.g > 1 || color.b > 1)
-                {
-                    float max = std::max(color.r, std::max(color.g, color.b));
-                    color.r = color.r / max;
-                    color.g = color.g / max;
-                    color.b = color.b / max;
-                }*/
+                // Clamp returned value just to be safe
                 glm::vec3 clampedColor = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
+
+                // Store in the cimg object
                 m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
                 m_renderTarget(x, y, 0, 1) = (unsigned char)(clampedColor.g * 255);
                 m_renderTarget(x, y, 0, 2) = (unsigned char)(clampedColor.b * 255);

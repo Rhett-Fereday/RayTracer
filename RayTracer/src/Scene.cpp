@@ -45,9 +45,9 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
+		// An object was hit - determine its lighting
 		for (int i = 0; i < m_lights.size(); i++)
-		{
-			// An object was hit - determine its lighting
+		{			
 			glm::vec3 shadowRay = m_lights[i]->DirectionToLight(hitInformation.hitPosition);
 			HitInfo occlusionInformation;
 			bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f * shadowRay, shadowRay, occlusionInformation);
@@ -55,6 +55,7 @@ namespace RayTracer
 			// Object might be occluded for this light
 			if (isOccluded)
 			{
+				// Was the intersection between the ray origin and the light?
 				if (occlusionInformation.hitDistance < m_lights[i]->DistanceToLight(hitInformation.hitPosition))
 				{
 					continue;
@@ -65,21 +66,23 @@ namespace RayTracer
 			intensity += m_lights[i]->Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
 		}
 
+		// Gotta clamp. Bad things happen when we don't clamp.
 		glm::vec3 clampedIntensity = glm::clamp(intensity, { 0,0,0 }, { 1,1,1 });
 
 		glm::vec3 diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
 		
-		glm::vec3 reflectionComponent = { 0,0,0 };
+		glm::vec3 reflectionComponent = { 0,0,0 }; // Must initialize to 0. It does so by default when compiling with VS2017. Not true for VS2019...
 		if (hitInformation.hitMaterial->reflectiveness > 0)
 		{
 			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
 			reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
 		}
-		//glm::vec3 emissiveComponent = hitInformation.hitMaterial->emissiveness;
 
+		// Make sure final result is clamped. No bad juju here
 		return glm::clamp(diffuseComponent + reflectionComponent, { 0,0,0 }, { 1,1,1 });
 	}
 
+	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.
 	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)
 	{
 		Object* hitObject = nullptr;

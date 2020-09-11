@@ -4,6 +4,7 @@
 
 namespace RayTracer
 {
+	// Base class to allow storing all light types in a single vector
 	class Light
 	{
 	public:

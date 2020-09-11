@@ -9,6 +9,7 @@ namespace RayTracer
 		m_direction = glm::normalize(direction);
 	}
 
+	// Directional lighting is very straightforward
 	glm::vec3 DirectionalLight::Illumination(const glm::vec3& point, const glm::vec3& normal, const glm::vec3& ray)
 	{
 		glm::vec3 returnIntensity = { 0,0,0 };

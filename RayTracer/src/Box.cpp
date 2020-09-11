@@ -15,6 +15,10 @@ namespace RayTracer
 	bool Box::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
 	{
 		{
+			// Code from http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/ modified to work with my program structure
+			// Comments were left from the original source for understanding
+
+
 			// Intersection method from Real-Time Rendering and Essential Mathematics for Games
 
 			float tMin = 0.0f;
