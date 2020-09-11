@@ -1,5 +1,5 @@
 # RayTracer
-Assignment 1 for CSE-8443
+Assignment 1 for CSE-8433
 
 ## Cloning
 When cloning the project it is necessary to recursively clone the submodules associated with it (glm, cimg).
