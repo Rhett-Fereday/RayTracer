@@ -7,6 +7,7 @@ When cloning the project it is necessary to recursively clone the submodules ass
 The command is formatted as: git clone --recurse-submodules "the url of this repo"
 
 This should hopefully initialize the submodules. If the cimg and glm folders inside of the RayTracer folder are empty then the submodules did not clone. If this occurs then the commands
+
 git submodule init
 and
 git submodule update
@@ -16,6 +17,7 @@ will remedy this. The project should now be successfully cloned.
 ## Solution Generation
 If using Visual Studio 2019 generating the solution file is as simple as double-clicking the GenerateProject.bat file in the root directory. If using another version of visual studio premake will need
 to be called with the correct argument from the command prompt in the root directory. For example:
+
 premake\premake5.exe vs2017
 
 This will generate a solution file for visual studio 2017.
