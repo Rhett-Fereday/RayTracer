@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	// Place 2 spheres in room
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-1, -0.2, -4.5));
 
-	RayTracer::Sphere leftSphere = RayTracer::Sphere(transform, &silverMat, 0.2f);
+	RayTracer::Sphere leftSphere = RayTracer::Sphere(transform, &mirrorMat, 0.2f);
 	
 	scene.AddObject(&leftSphere);
 
