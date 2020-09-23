@@ -4,3 +4,6 @@
 [submodule "RayTracer/lib/CImg"]
 	path = RayTracer/lib/CImg
 	url = https://github.com/dtschump/CImg.git
+[submodule "RayTracer\\lib\\tinyObj"]
+	path = RayTracer\\lib\\tinyObj
+	url = https://github.com/tinyobjloader/tinyobjloader.git

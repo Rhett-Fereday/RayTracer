@@ -11,6 +11,12 @@ namespace RayTracer
 		m_minDimensions = { -xDim, -yDim, -zDim };
 		m_maxDimensions = { xDim, yDim, zDim };
 	}
+
+	Box::Box(glm::mat4 transform, ConstMaterial * material, glm::vec3 minDimensions, glm::vec3 maxDimensions) : Object(transform, material)
+	{
+		m_minDimensions = minDimensions;
+		m_maxDimensions = maxDimensions;
+	}
 	
 	bool Box::Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo)
 	{

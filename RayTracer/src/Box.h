@@ -12,6 +12,7 @@ namespace RayTracer
 	{
 	public:
 		Box(glm::mat4 transform, ConstMaterial* material, glm::vec3 dimensions);
+		Box(glm::mat4 transform, ConstMaterial* material, glm::vec3 minDimensions, glm::vec3 maxDimensions);
 		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
 
 	private:

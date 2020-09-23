@@ -45,6 +45,8 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
+		//return hitInformation.hitMaterial->albedo;
+
 		// An object was hit - determine its lighting
 		for (int i = 0; i < m_lights.size(); i++)
 		{			
