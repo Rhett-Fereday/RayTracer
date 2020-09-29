@@ -90,10 +90,10 @@ namespace RayTracer
 		Object* hitObject = nullptr;
 		float closest = INFINITY;
 
-		HitInfo tempInfo;
-
 		for (int i = 0; i < m_objects.size(); i++)
 		{
+			HitInfo tempInfo;
+
 			if (m_objects[i]->Intersects(rayOrigin, ray, tempInfo))
 			{
 				if (tempInfo.hitDistance < closest)

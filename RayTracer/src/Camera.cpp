@@ -16,7 +16,7 @@ namespace RayTracer
         glm::vec3 center = lookAt - position;
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 1;
+		m_raysPerPixel = 16;
 	}
 	
     // Cast the camera rays into the scene. Code set up from scratchapixel.com with modifications to support camera transforms

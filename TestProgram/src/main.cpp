@@ -18,7 +18,7 @@ using namespace RayTracer;
 int main(int argc, char* argv[])
 {
 	// Create the camera with 1080p resolution and create a scene with it
-	Camera camera = RayTracer::Camera(300,300);
+	Camera camera = RayTracer::Camera(1920,1080);
 	Scene scene(camera);
 
 	// Create the lights for the scene
@@ -34,16 +34,17 @@ int main(int argc, char* argv[])
 	// Add a triangular mesh to the scene
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -50));	
-	transform = glm::rotate(transform, glm::radians(-35.0f), { 0,1,0 });
-	transform = glm::rotate(transform, glm::radians(-60.0f), { 1,0,0 });
+	//transform = glm::rotate(transform, glm::radians(-45.0f), { 0,1,0 });
+	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	
-	Mesh mesh = Mesh("teapot.obj");
+	
+	Mesh mesh = Mesh("teapot.obj", 7);
 	MeshInstance instance1 = MeshInstance(&mesh, transform, &whiteMat);
 	scene.AddObject(&instance1);
 
 	transform = glm::translate(transform, glm::vec3(0, -25, 0));
 	MeshInstance instance2 = MeshInstance(&mesh, transform, &redMat);
-	scene.AddObject(&instance2);
+	//scene.AddObject(&instance2);
 
 	// Render and save the image. The image saves in the TestProgram folder (when I run the project that's where VS puts it at least)
 

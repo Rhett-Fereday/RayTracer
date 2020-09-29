@@ -1,11 +1,13 @@
 #include "Mesh.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+#include "BoundingVolume.h"
+#include "BVH.h"
 #include <string>
 
 namespace RayTracer
 {
-	Mesh::Mesh(const char* file)
+	Mesh::Mesh(const char* file, int bvhDepth)
 	{
 		m_shapes = new std::vector<tinyobj::shape_t>();
 		m_materials = new std::vector<tinyobj::material_t>();
@@ -13,6 +15,8 @@ namespace RayTracer
 
 		std::string warning, error;
 		bool loaded = tinyobj::LoadObj(m_attrib, m_shapes, m_materials, &warning, &error, file);
+
+		m_bvh = new BVH(this, bvhDepth);
 
 		/*glm::vec3 minValues = {100000, 100000, 100000 };
 		glm::vec3 maxValues = { -100000, -100000, -100000 };
@@ -29,41 +33,56 @@ namespace RayTracer
 
 			if (vertex.z < minValues.z) minValues.z = vertex.z;
 			if (vertex.z > maxValues.z) maxValues.z = vertex.z;
-		}*/
+		}
+
+		std::vector<int>* indices = new std::vector<int>();
+
+		for (int i = 0; i < (*m_shapes)[0].mesh.indices.size(); i += 3)
+		{
+			indices->push_back(i);
+		}
+
+		BoundingVolume* bv = new BoundingVolume({ 0,0,0 }, minValues, maxValues, indices);
+		m_bvh->AddVolume(-1, bv);*/
 	}
 
 	bool Mesh::Intersects(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, HitInfo & hitInfo)
 	{
+		// check BVH for intersection
+		if (!m_bvh->Intersects(rayOrigin, rayDirection, hitInfo)) return false;
+
+		return true;
+
 		/*HitInfo boxCheck;
 		if (!m_boundingBox->Intersects(rayOrigin, rayDirection, boxCheck)) return false;*/
 
-		float closestDistance = 10000.0f;
-		bool returnValue = false;
+		//float closestDistance = 10000.0f;
+		//bool returnValue = false;
 
-		// Loop over every shape present in the model
-		for (int i = 0; i < m_shapes->size(); i++)
-		{
-			// Loop over all of the triangles in the mesh of this shape
-			for (int j = 0; j < (*m_shapes)[i].mesh.indices.size(); j += 3)
-			{
-				HitInfo tempInfo;
-				
-				TriangleData triangle = GetTriangleData(i, j);
+		//// Loop over every shape present in the model
+		//for (int i = 0; i < m_shapes->size(); i++)
+		//{
+		//	// Loop over all of the triangles in the mesh of this shape
+		//	for (int j = 0; j < (*m_shapes)[i].mesh.indices.size(); j += 3)
+		//	{
+		//		HitInfo tempInfo;
+		//		
+		//		TriangleData triangle = GetTriangleData(i, j);
 
-				// Test the triangle and update closest hit information
-				if (RayTriangleIntersect(rayOrigin, rayDirection, triangle, tempInfo))
-				{
-					if (tempInfo.hitDistance < closestDistance)
-					{
-						closestDistance = tempInfo.hitDistance;
-						hitInfo = tempInfo;
-						returnValue = true;
-					}
-				}
-			}
-		}
+		//		// Test the triangle and update closest hit information
+		//		if (RayTriangleIntersect(rayOrigin, rayDirection, triangle, tempInfo))
+		//		{
+		//			if (tempInfo.hitDistance < closestDistance)
+		//			{
+		//				closestDistance = tempInfo.hitDistance;
+		//				hitInfo = tempInfo;
+		//				returnValue = true;
+		//			}
+		//		}
+		//	}
+		//}
 
-		return returnValue;
+		//return returnValue;
 	}
 
 	// Ray triangle intersection using the Moller-Trumbore algorithm (scratchapixel.com)
