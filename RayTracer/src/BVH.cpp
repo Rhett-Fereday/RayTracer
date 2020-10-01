@@ -171,11 +171,33 @@ namespace RayTracer
 		BoundingVolume* volume = new BoundingVolume(minDimensions, maxDimensions);
 		int storedIndex = AddVolume(parentIndex, volume);
 
-		// At a leaf, so add Indices and end recursion
-		if (storedIndex >= m_firstLeafIndex)
+		//// At a leaf, so add Indices and end recursion
+		//if (storedIndex >= m_firstLeafIndex)
+		//{
+		//	std::vector<tinyobj::shape_t>* shapes = mesh->m_shapes;
+		//	std::vector<std::pair<int, int>>* leafIndices = new std::vector<std::pair<int, int>>();
+
+		//	// Loop over the shapes in the mesh
+		//	for (int i = 0; i < shapes->size(); i++)
+		//	{
+		//		// Loop over all of the triangles in the mesh of this shape
+		//		for (int j = 0; j < (*shapes)[i].mesh.indices.size(); j += 3)
+		//		{
+		//			TriangleData triangle = mesh->GetTriangleData(i, j);
+
+		//			if (BoundingVolume::IntersectsTriangle(volume, &triangle)) leafIndices->push_back(std::make_pair(i, j));
+		//		}
+		//	}
+
+		//	volume->m_indices = leafIndices;
+		//	return;
+		//}
+
+		// If it's the root volume we need to add all indices in the mesh
+		if (parentIndex == -1)
 		{
 			std::vector<tinyobj::shape_t>* shapes = mesh->m_shapes;
-			std::vector<std::pair<int, int>>* leafIndices = new std::vector<std::pair<int, int>>();
+			std::vector<std::pair<int, int>>* indicesInVolume = new std::vector<std::pair<int, int>>();
 
 			// Loop over the shapes in the mesh
 			for (int i = 0; i < shapes->size(); i++)
@@ -185,13 +207,31 @@ namespace RayTracer
 				{
 					TriangleData triangle = mesh->GetTriangleData(i, j);
 
-					if (BoundingVolume::IntersectsTriangle(volume, &triangle)) leafIndices->push_back(std::make_pair(i, j));
+					if (BoundingVolume::IntersectsTriangle(volume, &triangle)) indicesInVolume->push_back(std::make_pair(i, j));
 				}
 			}
 
-			volume->m_indices = leafIndices;
-			return;
+			volume->m_indices = indicesInVolume;
 		}
+		// Otherwise we need to see which indices of the parent volume fall in this volume
+		else
+		{
+			std::vector<std::pair<int, int>>* parentIndices = m_volumes[parentIndex]->m_indices;
+			std::vector<std::pair<int, int>>* indicesInVolume = new std::vector<std::pair<int, int>>();
+
+			for (int i = 0; i < parentIndices->size(); i++)
+			{
+				std::pair<int, int> indexData = (*parentIndices)[i];
+				TriangleData triangle = mesh->GetTriangleData(indexData.first, indexData.second);
+
+				if (BoundingVolume::IntersectsTriangle(volume, &triangle)) indicesInVolume->push_back(std::make_pair(indexData.first, indexData.second));
+			}
+
+			volume->m_indices = indicesInVolume;
+		}
+
+		// Leaf volume, break recursion
+		if (storedIndex >= m_firstLeafIndex) return;
 
 		// Not a leaf, so create child volumes
 		glm::vec3 currentDimensions = maxDimensions - minDimensions;

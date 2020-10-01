@@ -18,8 +18,8 @@ namespace RayTracer
 			hitInfo.hitPosition = rayOrigin + rayDirection * hitInfo.hitDistance;
 			hitInfo.hitMaterial = m_material;
 
-			glm::vec4 tempNormal = m_transform * glm::vec4(hitInfo.hitNormal, 0);
-			hitInfo.hitNormal = { tempNormal.x, tempNormal.y, tempNormal.z };
+			glm::vec4 tempNormal = m_inverseTransposeTransform * glm::vec4(hitInfo.hitNormal, 0);
+			hitInfo.hitNormal = glm::normalize(glm::vec3(tempNormal.x, tempNormal.y, tempNormal.z));
 
 			return true;
 		}

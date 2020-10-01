@@ -15,6 +15,6 @@ namespace RayTracer
 
 	protected:
 		ConstMaterial* m_material;
-		glm::mat4 m_transform, m_inverseTransform;
+		glm::mat4 m_transform, m_inverseTransform, m_inverseTransposeTransform;
 	};
 }
