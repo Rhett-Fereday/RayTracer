@@ -1,12 +1,12 @@
 # RayTracer
-Assignment 1 for CSE-8433
+Assignment 2 for CSE-8433
 
 ## Cloning
 When cloning the project it is necessary to recursively clone the submodules associated with it (glm, cimg).
 
 The command is formatted as: git clone --recurse-submodules "the url of this repo"
 
-This should hopefully initialize the submodules. If the cimg and glm folders inside of the RayTracer folder are empty then the submodules did not clone. If this occurs then the commands
+This should hopefully initialize the submodules. If the cimg, glm, and tinyObj folders inside of the RayTracer folder are empty then the submodules did not clone. If this occurs then the commands
 
 git submodule init
 and
