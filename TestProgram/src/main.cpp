@@ -18,7 +18,7 @@ using namespace RayTracer;
 int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
-	Camera camera = RayTracer::Camera(500, 500, 45.0f, { 0,0.25,0 }, { 0,0,-3 });
+	Camera camera = RayTracer::Camera(1000, 1000, 45.0f, { 0,0.25,0 }, { 0,0,-3 });
 	Scene scene(camera);
 
 	// Add sunlight to the scene
@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
 
 	// Create the materials to be used in the scene
 	ConstMaterial bunnyMat; bunnyMat.albedo = { 1,1,1 }; bunnyMat.reflectiveness = 0.0f;
-	ConstMaterial amphoraMat; amphoraMat.albedo = { 0.955, 0.637, 0.538 }; amphoraMat.reflectiveness = 0.2f;
-	ConstMaterial teapotMat; teapotMat.albedo = { 0.972, 0.960, 0.915 }; teapotMat.reflectiveness = 0.3f;
-	ConstMaterial floorMat1; floorMat1.albedo = { 1,0,0 }; floorMat1.reflectiveness = 0.2f;
+	ConstMaterial amphoraMat; amphoraMat.albedo = { 0.955, 0.637, 0.538 }; amphoraMat.reflectiveness = 0.0f;
+	ConstMaterial teapotMat; teapotMat.albedo = { 0.972, 0.960, 0.915 }; teapotMat.reflectiveness = 0.0f;
+	ConstMaterial floorMat1; floorMat1.albedo = { 1,0,0 }; floorMat1.reflectiveness = 0.0f;
 	ConstMaterial floorMat2; floorMat2.albedo = { 0.1, 0.1, 0.1 }; floorMat2.reflectiveness = 0.0f;
 	ConstMaterial backWallMat; backWallMat.albedo = { 1,1,1 }; backWallMat.reflectiveness = 0.0f;
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
 	// Add the floor and wall to the scene
 	transform = glm::translate(glm::mat4(1.0f), { 0,-0.025,-2.5 });
-	Box floor = Box(transform, &floorMat1, { 10,0.05,5 });
+	Box floor = Box(transform, &floorMat1, { 10,0.05,10 });
 	scene.AddObject(&floor);
 
 	// Add back wall

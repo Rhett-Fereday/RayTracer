@@ -48,7 +48,7 @@ namespace RayTracer
 					glm::vec3 ray(i, j, -1);
 
 					// Transform the rays from camera space into world space.
-					glm::vec4 temp = glm::normalize(m_cameraToWorld * glm::vec4(ray, 0));
+					glm::vec4 temp = m_cameraToWorld * glm::vec4(ray, 0);
 					ray = glm::normalize(glm::vec3(temp.x, temp.y, temp.z));
 
 					// Cast the ray using the Scene class' recursive TraceRay method

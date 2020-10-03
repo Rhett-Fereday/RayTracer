@@ -11,11 +11,9 @@ namespace RayTracer
 	class RT_API Sphere : public Object
 	{
 	public:
-		Sphere(glm::mat4 transform, ConstMaterial* material, float radius);
-		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
+		Sphere(glm::mat4 transform, ConstMaterial* material);
 
-	private:
-		float m_radius;
-		glm::vec3 m_center;
+	protected:
+		bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
 	};
 }

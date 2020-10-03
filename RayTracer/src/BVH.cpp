@@ -10,7 +10,7 @@ namespace RayTracer
 		m_mesh = mesh;
 		m_firstLeafIndex = pow(2, depth) - 1;
 
-		m_volumes.resize(pow(2, depth + 1) - 1, nullptr);
+		m_volumes.resize(pow(2, depth + 1) - 1, std::make_pair(nullptr,nullptr));
 
 		glm::vec3 minDimensions = { 100000, 100000, 100000 };
 		glm::vec3 maxDimensions = { -100000, -100000, -100000 };
@@ -34,16 +34,16 @@ namespace RayTracer
 	}
 
 	// Add a volume into the implicit binary tree. Returns index at which it was added
-	int BVH::AddVolume(int parentIndex, BoundingVolume * volume)
+	int BVH::AddVolume(int parentIndex, RTMath::AABB * volume)
 	{
 		// Root volume
 		if (parentIndex == -1)
 		{
 			// Root already exists
-			if (m_volumes[0] != nullptr) return -1;
+			if (m_volumes[0].first != nullptr) return -1;
 
 			// Set root
-			m_volumes[0] = volume;
+			m_volumes[0].first = volume;
 			return 0;
 		}
 
@@ -51,18 +51,18 @@ namespace RayTracer
 		int index = 2 * parentIndex + 1;
 
 		// Don't actually care about left/right just see if this spot is available
-		if (m_volumes[index] == nullptr)
+		if (m_volumes[index].first == nullptr)
 		{
-			m_volumes[index] = volume;
+			m_volumes[index].first = volume;
 			return index;
 		}
 
 		index++;
 
 		// Left wasn't available; check right
-		if (m_volumes[index] == nullptr)
+		if (m_volumes[index].first == nullptr)
 		{
-			m_volumes[index] = volume;
+			m_volumes[index].first = volume;
 			return index;
 		}
 
@@ -72,45 +72,18 @@ namespace RayTracer
 
 	bool BVH::Intersects(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, HitInfo &hitInfo)
 	{
-		float hitDistance;
-		//// Test highest level bounding volume
-		//if (!m_volumes[0]->Intersects(rayOrigin, rayDirection, hitDistance)) return false;
-
 		// We hit the top level, must recurse down hierarchy
 		return IntersectionTraversal(0, rayOrigin, rayDirection, hitInfo);
-
-		/*float closestHit = 1000000.0f;
-		bool returnValue = false;
-
-		for (int i = m_firstLeafIndex; i < m_volumes.size(); i++)
-		{			
-			for (int j = 0; j < m_volumes[i]->m_indices->size(); j++)
-			{
-				std::vector<std::pair<int, int>>* indices = m_volumes[i]->m_indices;
-				TriangleData triangle = m_mesh->GetTriangleData((*indices)[j].first, (*indices)[j].second);
-				HitInfo tempInfo;
-
-				if (m_mesh->RayTriangleIntersect(rayOrigin, rayDirection, triangle, tempInfo))
-				{					
-					if (tempInfo.hitDistance < closestHit)
-					{
-						returnValue = true;
-						closestHit = tempInfo.hitDistance;
-						hitInfo = tempInfo;
-					}
-				}
-			}
-		}
-
-		return returnValue;*/
 	}
 
 	bool BVH::IntersectionTraversal(int currentIndex, const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, HitInfo &hitInfo)
 	{
-		float hitDistance;
+		float tempDistance;
+		glm::vec3 tempNormal;		
+		RTMath::AABB* volume = m_volumes[currentIndex].first;
 
 		// Didn't hit the volume
-		if (!m_volumes[currentIndex]->Intersects(rayOrigin, rayDirection, hitDistance)) return false;
+		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, *volume, tempNormal, tempDistance)) return false;
 
 		// Leaf volume, check triangles
 		if (currentIndex >= m_firstLeafIndex)
@@ -141,22 +114,24 @@ namespace RayTracer
 
 	bool BVH::IntersectVolumeTriangles(int volumeIndex, const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, HitInfo & hitInfo)
 	{
-		std::vector<std::pair<int, int>>* indices = m_volumes[volumeIndex]->m_indices;
+		std::vector<std::pair<int, int>>* indices = m_volumes[volumeIndex].second;
 		float closestHit = 1000000.0f;
 		bool returnValue = false;
 
 		for (int i = 0; i < indices->size(); i++)
 		{
-			TriangleData triangle = m_mesh->GetTriangleData((*indices)[i].first, (*indices)[i].second);
-			HitInfo tempInfo;
+			RTMath::Triangle triangle = m_mesh->GetTriangleData((*indices)[i].first, (*indices)[i].second);
+			glm::vec3 tempNormal;
+			float tempDistance = 1000000.0f;
 
-			if (m_mesh->RayTriangleIntersect(rayOrigin, rayDirection, triangle, tempInfo))
+			if (RTMath::RayTriangleIntersection(rayOrigin,rayDirection, triangle, tempNormal, tempDistance))
 			{
-				if (tempInfo.hitDistance < closestHit)
+				if (tempDistance < closestHit)
 				{
 					returnValue = true;
-					closestHit = tempInfo.hitDistance;
-					hitInfo = tempInfo;
+					closestHit = tempDistance;
+					hitInfo.hitDistance = tempDistance;
+					hitInfo.hitNormal = tempNormal;
 				}
 			}
 		}
@@ -168,30 +143,11 @@ namespace RayTracer
 	{
 		// Create the volume at this level
 
-		BoundingVolume* volume = new BoundingVolume(minDimensions, maxDimensions);
+		RTMath::AABB* volume = new RTMath::AABB();
+		volume->minDimensions = minDimensions;
+		volume->maxDimensions = maxDimensions;
+
 		int storedIndex = AddVolume(parentIndex, volume);
-
-		//// At a leaf, so add Indices and end recursion
-		//if (storedIndex >= m_firstLeafIndex)
-		//{
-		//	std::vector<tinyobj::shape_t>* shapes = mesh->m_shapes;
-		//	std::vector<std::pair<int, int>>* leafIndices = new std::vector<std::pair<int, int>>();
-
-		//	// Loop over the shapes in the mesh
-		//	for (int i = 0; i < shapes->size(); i++)
-		//	{
-		//		// Loop over all of the triangles in the mesh of this shape
-		//		for (int j = 0; j < (*shapes)[i].mesh.indices.size(); j += 3)
-		//		{
-		//			TriangleData triangle = mesh->GetTriangleData(i, j);
-
-		//			if (BoundingVolume::IntersectsTriangle(volume, &triangle)) leafIndices->push_back(std::make_pair(i, j));
-		//		}
-		//	}
-
-		//	volume->m_indices = leafIndices;
-		//	return;
-		//}
 
 		// If it's the root volume we need to add all indices in the mesh
 		if (parentIndex == -1)
@@ -205,29 +161,27 @@ namespace RayTracer
 				// Loop over all of the triangles in the mesh of this shape
 				for (int j = 0; j < (*shapes)[i].mesh.indices.size(); j += 3)
 				{
-					TriangleData triangle = mesh->GetTriangleData(i, j);
-
-					if (BoundingVolume::IntersectsTriangle(volume, &triangle)) indicesInVolume->push_back(std::make_pair(i, j));
+					indicesInVolume->push_back(std::make_pair(i, j));
 				}
 			}
 
-			volume->m_indices = indicesInVolume;
+			m_volumes[storedIndex].second = indicesInVolume;
 		}
 		// Otherwise we need to see which indices of the parent volume fall in this volume
 		else
 		{
-			std::vector<std::pair<int, int>>* parentIndices = m_volumes[parentIndex]->m_indices;
+			std::vector<std::pair<int, int>>* parentIndices = m_volumes[parentIndex].second;
 			std::vector<std::pair<int, int>>* indicesInVolume = new std::vector<std::pair<int, int>>();
 
 			for (int i = 0; i < parentIndices->size(); i++)
 			{
 				std::pair<int, int> indexData = (*parentIndices)[i];
-				TriangleData triangle = mesh->GetTriangleData(indexData.first, indexData.second);
+				RTMath::Triangle triangle = mesh->GetTriangleData(indexData.first, indexData.second);
 
-				if (BoundingVolume::IntersectsTriangle(volume, &triangle)) indicesInVolume->push_back(std::make_pair(indexData.first, indexData.second));
+				if (RTMath::TriangleAABBIntersection(*volume, triangle)) indicesInVolume->push_back(std::make_pair(indexData.first, indexData.second));
 			}
 
-			volume->m_indices = indicesInVolume;
+			m_volumes[storedIndex].second = indicesInVolume;
 		}
 
 		// Leaf volume, break recursion

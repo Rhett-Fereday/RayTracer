@@ -12,7 +12,9 @@ namespace RayTracer
 	{
 	public:
 		MeshInstance(Mesh* mesh, glm::mat4 transform, ConstMaterial* material);
-		bool Intersects(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
+
+	protected:
+		virtual bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
 
 	private:
 		Mesh* m_mesh;
