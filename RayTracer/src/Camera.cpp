@@ -41,8 +41,8 @@ namespace RayTracer
 
 				for (int r = 0; r < m_raysPerPixel; r++)
 				{
-					xOffset = 0;// -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
-					yOffset = 0;// -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
+					xOffset = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
+					yOffset = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
 					float i = (2 * ((x + 0.5f + xOffset) * widthInverse) - 1) * angle * aspectRatio;
 					float j = (1 - 2 * ((y + 0.5f + yOffset) * heightInverse)) * angle;
 					glm::vec3 ray(i, j, -1);

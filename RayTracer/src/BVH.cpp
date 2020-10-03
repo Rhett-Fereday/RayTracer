@@ -77,11 +77,11 @@ namespace RayTracer
 	}
 
 	bool BVH::IntersectionTraversal(int currentIndex, const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, HitInfo &hitInfo)
-	{
-		float tempDistance;
-		glm::vec3 tempNormal;		
+	{	
 		RTMath::AABB* volume = m_volumes[currentIndex].first;
 
+		float tempDistance;
+		glm::vec3 tempNormal;
 		// Didn't hit the volume
 		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, *volume, tempNormal, tempDistance)) return false;
 
