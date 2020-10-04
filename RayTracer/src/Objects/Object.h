@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ConstMaterial.h"
-#include "HitInfo.h"
+#include "../ConstMaterial.h"
+#include "../HitInfo.h"
 #include "glm/glm.hpp"
 
 namespace RayTracer

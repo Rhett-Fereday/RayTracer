@@ -1,5 +1,5 @@
 #include "BVH.h"
-#include "Mesh.h"
+#include "Objects/Mesh.h"
 #include "tiny_obj_loader.h"
 #include <math.h>
 

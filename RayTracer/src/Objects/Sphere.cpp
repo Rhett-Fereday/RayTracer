@@ -1,5 +1,5 @@
 #include "Sphere.h"
-#include "RTMath.h"
+#include "../RTMath.h"
 #include "glm/glm.hpp"
 
 namespace RayTracer

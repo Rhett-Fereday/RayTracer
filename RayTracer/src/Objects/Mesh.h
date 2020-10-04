@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core.h"
+#include "../Core.h"
 #include "Object.h"
 #include "Box.h"
-#include "RTMath.h"
+#include "../RTMath.h"
 #include <vector>
 
 namespace tinyobj

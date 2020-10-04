@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mesh.h"
+#include "Objects/Mesh.h"
 #include "RTMath.h"
 #include <vector>
 

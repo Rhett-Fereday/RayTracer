@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core.h"
+#include "../Core.h"
 #include "Object.h"
-#include "ConstMaterial.h"
-#include "HitInfo.h"
+#include "../ConstMaterial.h"
+#include "../HitInfo.h"
 #include "glm/glm.hpp"
-#include "RTMath.h"
+#include "../RTMath.h"
 
 namespace RayTracer
 {

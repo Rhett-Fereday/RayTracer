@@ -45,7 +45,10 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
-		//return hitInformation.hitMaterial->albedo;
+		if (hitInformation.hitMaterial->emissiveness == glm::vec3(0, 0, 0))
+		{
+			bool test = true;
+		}
 
 		// An object was hit - determine its lighting
 		for (int i = 0; i < m_lights.size(); i++)
@@ -81,7 +84,7 @@ namespace RayTracer
 		}
 
 		// Make sure final result is clamped. No bad juju here
-		return glm::clamp(diffuseComponent + reflectionComponent, { 0,0,0 }, { 1,1,1 });
+		return glm::clamp(diffuseComponent + reflectionComponent + hitInformation.hitMaterial->emissiveness, { 0,0,0 }, { 1,1,1 });
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.

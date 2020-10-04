@@ -3,9 +3,9 @@
 #include <vector>
 
 #include "Camera.h"
-#include "Object.h"
+#include "Objects/Object.h"
 #include "Core.h"
-#include "Light.h"
+#include "Lights/Light.h"
 
 namespace RayTracer
 {

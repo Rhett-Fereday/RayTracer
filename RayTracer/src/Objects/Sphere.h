@@ -1,10 +1,10 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "Core.h"
+#include "../Core.h"
 #include "Object.h"
-#include "ConstMaterial.h"
-#include "HitInfo.h"
+#include "../ConstMaterial.h"
+#include "../HitInfo.h"
 
 namespace RayTracer
 {

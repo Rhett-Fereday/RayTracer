@@ -1,5 +1,5 @@
 #include "Box.h"
-#include "RTMath.h"
+#include "../RTMath.h"
 
 namespace RayTracer
 {
