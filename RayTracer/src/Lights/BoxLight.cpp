@@ -33,7 +33,7 @@ namespace RayTracer
 	{
 		glm::vec3 returnIntensity = { 0,0,0 };
 
-		float incidence = std::max(0.0f, glm::dot(normal, m_randomDirection));
+		float incidence = std::max(0.0f, glm::dot(glm::normalize(normal), glm::normalize(m_randomDirection)));
 
 		if (incidence > 0.0f)
 		{
@@ -48,9 +48,9 @@ namespace RayTracer
 	glm::vec3 BoxLight::DirectionToLight(const glm::vec3 & point)
 	{
 		//srand(static_cast <unsigned> (time(0)));
-		float x = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
-		float y = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
-		float z = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
+		float x = (-m_dimensions.x / 2.0f) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((m_dimensions.x / 2.0f) - (-m_dimensions.x / 2.0f))));
+		float y = (-m_dimensions.y / 2.0f) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((m_dimensions.y / 2.0f) - (-m_dimensions.y / 2.0f))));
+		float z = (-m_dimensions.z / 2.0f) + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / ((m_dimensions.z / 2.0f) - (-m_dimensions.z / 2.0f))));
 
 		glm::vec4 testPoint = m_transform * glm::vec4(x, y, z, 1); // Convert random point in the boxlight to world space
 

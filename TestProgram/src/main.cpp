@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
 	// Create the materials to be used in the scene
 	ConstMaterial bunnyMat; bunnyMat.albedo = { 1,1,1 }; bunnyMat.emissiveness = { 0.0f,0.0f,0.0f }; bunnyMat.reflectiveness = 0.0f;
 	ConstMaterial amphoraMat; amphoraMat.albedo = { 0.955, 0.637, 0.538 }; amphoraMat.emissiveness = { 0.0f,0.0f,0.0f }; amphoraMat.reflectiveness = 0.0f;
-	ConstMaterial teapotMat; teapotMat.albedo = { 0.972, 0.960, 0.915 }; teapotMat.emissiveness = { 0.0f,0.0f,0.0f }; teapotMat.reflectiveness = 0.0f;
+	ConstMaterial teapotMat; teapotMat.albedo = { 0.972, 0.960, 0.915 }; teapotMat.emissiveness = { 0.0f,0.0f,0.0f }; teapotMat.reflectiveness = 0.1f;
 	ConstMaterial floorMat1; floorMat1.albedo = { 1,0,0 }; floorMat1.emissiveness = { 0.0f,0.0f,0.0f }; floorMat1.reflectiveness = 0.0f;
-	ConstMaterial floorMat2; floorMat2.albedo = { 0.1, 0.1, 0.1 }; floorMat2.emissiveness = { 0.0f,0.0f,0.0f }; floorMat2.reflectiveness = 0.0f;
+	ConstMaterial floorMat2; floorMat2.albedo = { 0,0,1 }; floorMat2.emissiveness = { 0.0f,0.0f,0.0f }; floorMat2.reflectiveness = 0.0f;
 	ConstMaterial backWallMat; backWallMat.albedo = { 1,1,1 }; backWallMat.emissiveness = { 0.0f,0.0f,0.0f }; backWallMat.reflectiveness = 0.0f;
 	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveness = { 1,1,1 }; areaLightMat.reflectiveness = 0.0f;
 
@@ -41,13 +41,13 @@ int main(int argc, char* argv[])
 	//scene.AddLight(&plight);
 
 	// Add an area light
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1, -3 });
-	BoxLight boxLight = BoxLight(transform, { 1,1,1 }, &areaLightMat, { 1,1,1 }, 5.0f);
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0.98, -2.5 });
+	BoxLight boxLight = BoxLight(transform, { 0.5,0.01,0.5 }, &areaLightMat, { 1,1,1 }, 1.0f);
 	scene.AddLight(&boxLight); 
 	//scene.AddObject(&boxLight); // Area lights are objects and lights
 
 	// Load the meshes for the scene
-	//Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
+	Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
 	//Mesh amphoraMesh = Mesh("amphora.obj", 10);
 	Mesh teapotMesh = Mesh("teapot.obj", 11);
 
@@ -58,9 +58,9 @@ int main(int argc, char* argv[])
 	//MeshInstance bunnyInstance = MeshInstance(&bunnyMesh, transform, &bunnyMat);
 	//scene.AddObject(&bunnyInstance);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -2.75 });
+	transform = glm::translate(glm::mat4(1.0f), { 0.15, 0, -3.1 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
-	transform = glm::rotate(transform, glm::radians(-25.0f), { 0,0,1 });
+	transform = glm::rotate(transform, glm::radians(-30.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
 	MeshInstance teapotInstance = MeshInstance(&teapotMesh, transform, &teapotMat);
 	scene.AddObject(&teapotInstance);
@@ -75,8 +75,17 @@ int main(int argc, char* argv[])
 	Box floor = Box(transform, &floorMat1, { 10,0.05,10 });
 	scene.AddObject(&floor);
 
+	transform = glm::translate(glm::mat4(1.0f), { 0, 1.025, -2.5 });
+	Box ceiling = Box(transform, &floorMat2, { 10, 0.05, 10 });
+	//scene.AddObject(&ceiling);
+
+	transform = glm::translate(glm::mat4(1.0f), { 0, 1, -2.5 });
+	Box fakeLight = Box(transform, &areaLightMat, { 0.5, 0.01, 0.5 });
+	scene.AddObject(&fakeLight);
+
+
 	// Add back wall
-	transform = glm::translate(glm::mat4(1.0f), { 0,0,-5 });
+	transform = glm::translate(glm::mat4(1.0f), { 0,0,-100 });
 	Box backWall = Box(transform, &backWallMat, { 10,10,0.05 });
 	//scene.AddObject(&backWall);
 
