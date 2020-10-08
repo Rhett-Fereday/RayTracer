@@ -7,3 +7,6 @@
 [submodule "RayTracer\\lib\\tinyObj"]
 	path = RayTracer\\lib\\tinyObj
 	url = https://github.com/tinyobjloader/tinyobjloader.git
+[submodule "RayTracer/lib/tinyObj"]
+	path = RayTracer/lib/tinyObj
+	url = https://github.com/tinyobjloader/tinyobjloader.git
