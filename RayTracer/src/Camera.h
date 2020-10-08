@@ -13,7 +13,7 @@ namespace RayTracer
 	friend class Scene;
 
 	public:
-		Camera(unsigned int width = 1920, unsigned int height = 1080, float fov = 90, glm::vec3 position = { 0,0,0 }, glm::vec3 lookAt = { 0.0f, 0.0f, -5.0f }, glm::vec3 upVector = { 0,1,0 });
+		Camera(unsigned int width = 1920, unsigned int height = 1080, float fov = 90, glm::vec3 position = { 0,0,0 }, glm::vec3 lookAt = { 0.0f, 0.0f, -1.0f }, float lensRadius = 0.055f, glm::vec3 upVector = { 0,1,0 });
 
 	protected:
 		void Render(Scene* scene);
@@ -21,7 +21,7 @@ namespace RayTracer
 
 	private:
 		unsigned int m_width, m_height, m_raysPerPixel;
-		float m_fov;
+		float m_fov, m_focalDistance, m_lensRadius;
 		glm::vec3 m_position;
 		glm::mat4 m_worldToCamera, m_cameraToWorld;
 		cimg_library::CImg<unsigned char> m_renderTarget;

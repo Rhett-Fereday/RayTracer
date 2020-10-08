@@ -39,7 +39,7 @@ namespace RayTracer
 		{
 			float r = glm::distance(m_surfacePoint, point);
 			float lightReceived = m_intensity / (r * r);
-			returnIntensity = m_color * lightReceived * incidence;
+			returnIntensity = (m_color * lightReceived * incidence);
 		}
 
 		return returnIntensity;
