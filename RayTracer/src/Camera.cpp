@@ -15,7 +15,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 16;
+		m_raysPerPixel = 256;
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
 	}

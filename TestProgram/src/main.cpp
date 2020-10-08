@@ -19,7 +19,7 @@ using namespace RayTracer;
 int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.5,-1.5 }, { 0,0,-3 });
+	Camera camera = RayTracer::Camera(1920, 1080, 45.0f, { 0,0.5,-1.5 }, { 0,0,-3 });
 	Scene scene(camera);
 	
 
@@ -34,11 +34,11 @@ int main(int argc, char* argv[])
 
 	// Add area lights
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.48, -2 });
-	BoxLight boxLight1 = BoxLight(transform, { 0.5,0.01,0.5 }, &areaLightMat, { 1,1,1 }, 5.0f);
+	BoxLight boxLight1 = BoxLight(transform, { 1,0.01,1 }, &areaLightMat, { 1,1,1 }, 5.0f);
 	scene.AddLight(&boxLight1);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 1.5, -2 });
-	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.01, 0.5 });
+	Box fakeLight1 = Box(transform, &areaLightMat, { 1, 0.01, 1 });
 	scene.AddObject(&fakeLight1);
 
 	DirectionalLight sunLight = DirectionalLight({ -0.5,-1,-1 }, { 1,1,1 });
