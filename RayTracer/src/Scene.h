@@ -27,6 +27,6 @@ namespace RayTracer
 		int m_recursionLimit;
 
 		glm::vec3 TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth);
-		bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation);
+		bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation, bool includeTransparentObjects = true);
 	};
 }

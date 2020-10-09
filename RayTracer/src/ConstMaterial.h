@@ -11,5 +11,7 @@ namespace RayTracer
 		glm::vec3 albedo;
 		glm::vec3 emissiveness;
 		float reflectiveness;
+		bool isTransparent;
+		float refractiveIndex;
 	};
 }

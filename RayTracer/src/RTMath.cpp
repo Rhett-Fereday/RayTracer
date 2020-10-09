@@ -1,5 +1,6 @@
 #include "RTMath.h"
 #include <vector>
+#include <algorithm>
 
 namespace RayTracer
 {
@@ -12,7 +13,7 @@ namespace RayTracer
 		//This method assumes the rayOrigin and rayDirection are in model space.
 		bool RaySphereIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const float & radius, glm::vec3 & hitNormal, float & hitDistance)
 		{
-			float a = 1.0f;//dot(rayDirection, rayDirection); Since it's normalized this is always 1
+			float a = dot(rayDirection, rayDirection);
 			float b = dot(2.0f * rayDirection, rayOrigin);
 			float c = dot(rayOrigin, rayOrigin) - (radius * radius);
 
@@ -117,7 +118,8 @@ namespace RayTracer
 			glm::vec3 pvec = cross(rayDirection, v0v2);
 			float det = dot(v0v1, pvec);
 
-			if (fabs(det) < 0.0001) return false;
+			//if (fabs(det) < 0.0001) return false;
+			if (det < 0.0001) return false;
 
 			float invDet = 1.0f / det;
 
@@ -214,6 +216,34 @@ namespace RayTracer
 
 			// There was no separating axis -> the triangle is in this volume
 			return true;
+		}
+
+		float Fresnel(const glm::vec3 & incomingDirection, const glm::vec3 & normal, const float & refractiveIndex)
+		{
+			float reflectivePortion;
+			float cosi = dot(incomingDirection, normal);
+			float etai = 1.0f, etat = refractiveIndex;
+
+			if (cosi > 0) std::swap(etai, etat);
+
+			// Compute sini using Snell's law
+			float sint = etai / etat * sqrtf(std::max(0.0f, 1.0f - cosi * cosi));
+
+			// Total internal reflection
+			if (sint >= 1) 
+			{
+				reflectivePortion = 1.0f;
+			}
+			else 
+			{
+				float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+				cosi = fabsf(cosi);
+				float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+				float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+				reflectivePortion = (Rs * Rs + Rp * Rp) / 2;
+			}
+
+			return reflectivePortion;
 		}
 	}
 }
