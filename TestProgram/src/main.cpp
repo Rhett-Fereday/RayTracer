@@ -19,7 +19,7 @@ using namespace RayTracer;
 int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
-	Camera camera = RayTracer::Camera(1920, 1080, 45.0f, { 0,0.5,-1.5 }, { 0,0,-3 });
+	Camera camera = RayTracer::Camera(1920, 1080, 45.0f, { 0,0.5,-1.5 }, { 0,0.25,-2.85 });
 	Scene scene(camera);
 	
 
