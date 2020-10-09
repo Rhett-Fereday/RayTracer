@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "RTMath.h"
 
 namespace RayTracer
 {
@@ -45,17 +46,12 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
-		if (hitInformation.hitMaterial->emissiveness == glm::vec3(0, 0, 0))
-		{
-			bool test = true;
-		}
-
 		// An object was hit - determine its lighting
 		for (int i = 0; i < m_lights.size(); i++)
 		{			
 			glm::vec3 shadowRay = m_lights[i]->DirectionToLight(hitInformation.hitPosition);
 			HitInfo occlusionInformation;
-			bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f * shadowRay, shadowRay, occlusionInformation);
+			bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f * shadowRay, shadowRay, occlusionInformation, false);
 
 			// Object might be occluded for this light
 			if (isOccluded)
@@ -73,22 +69,47 @@ namespace RayTracer
 
 		// Gotta clamp. Bad things happen when we don't clamp.
 		glm::vec3 clampedIntensity = glm::clamp(intensity, { 0,0,0 }, { 1,1,1 });
-
-		glm::vec3 diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
-		
+		glm::vec3 diffuseComponent = { 0,0,0 };// clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
 		glm::vec3 reflectionComponent = { 0,0,0 }; // Must initialize to 0. It does so by default when compiling with VS2017. Not true for VS2019...
-		if (hitInformation.hitMaterial->reflectiveness > 0)
+		glm::vec3 transmissionComponent = { 0,0,0 };
+		glm::vec3 outputColor = { 0,0,0 };
+
+		// Handle transparency
+		if (hitInformation.hitMaterial->isTransparent)
 		{
+			// Calculate the reflection and transmission rays. Use fresnel to determine reflection strength.
 			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
-			reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+			glm::vec3 transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, 1.0f / hitInformation.hitMaterial->refractiveIndex));
+			float reflectionStrength = RTMath::Fresnel(ray, hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex);
+
+			// Trace the reflection ray
+			reflectionComponent = reflectionStrength * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+
+			// Only trace the transmission ray if not internal reflection
+			if(reflectionStrength < 1.0f) transmissionComponent = (1.0f - reflectionStrength) * TraceRay(hitInformation.hitPosition + 0.001f * transmissionRay, transmissionRay, { 1,1,1 }, depth + 1);
+
+			outputColor = glm::clamp(reflectionComponent + transmissionComponent, { 0,0,0 }, { 1,1,1 });
+		}
+		else
+		{
+			// Handle fully diffuse and partially reflective objects
+			diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1.0f - hitInformation.hitMaterial->reflectiveness);
+
+			// Only bother with reflection if it matters
+			if (hitInformation.hitMaterial->reflectiveness > 0)
+			{
+				glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
+				reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
+			}
+
+			outputColor = glm::clamp(diffuseComponent + reflectionComponent + hitInformation.hitMaterial->emissiveness, { 0,0,0 }, { 1,1,1 });
 		}
 
-		// Make sure final result is clamped. No bad juju here
-		return glm::clamp(diffuseComponent + reflectionComponent + hitInformation.hitMaterial->emissiveness, { 0,0,0 }, { 1,1,1 });
+		return outputColor;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.
-	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation)
+	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation, bool includeTransparentObjects)
 	{
 		Object* hitObject = nullptr;
 		float closest = INFINITY;
@@ -99,6 +120,8 @@ namespace RayTracer
 
 			if (m_objects[i]->Intersects(rayOrigin, ray, tempInfo))
 			{
+				if (tempInfo.hitMaterial->isTransparent && !includeTransparentObjects) continue;
+
 				if (tempInfo.hitDistance < closest)
 				{
 					closest = tempInfo.hitDistance;
