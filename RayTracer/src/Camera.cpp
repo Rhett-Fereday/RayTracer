@@ -40,8 +40,8 @@ namespace RayTracer
 				for (int r = 0; r < m_raysPerPixel; r++)
 				{
 					// Calculate random pixel through the image plane
-					float xOffset = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
-					float yOffset = -0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
+					float xOffset = 0.0f;//-0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
+					float yOffset = 0.0f;//-0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.5f - -0.5f)));
 
 					float i = (2 * ((x + 0.5f + xOffset) * widthInverse) - 1) * angle * aspectRatio;
 					float j = (1 - 2 * ((y + 0.5f + yOffset) * heightInverse)) * angle;

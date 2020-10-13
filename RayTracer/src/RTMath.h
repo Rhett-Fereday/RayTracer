@@ -19,7 +19,7 @@ namespace RayTracer
 			glm::vec3 v2, n2;
 		};
 
-		bool RaySphereIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const float &radius, glm::vec3 &hitNormal, float &hitDistance);
+		bool RaySphereIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const float &radius, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
 		bool RayAABBIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const AABB& aabb, glm::vec3 &hitNormal, float &hitDistance);
 		bool RayTriangleIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const Triangle &triangle, glm::vec3 &hitNormal, float &hitDistance);
 		bool TriangleAABBIntersection(const AABB& aabb, const Triangle &triangle);

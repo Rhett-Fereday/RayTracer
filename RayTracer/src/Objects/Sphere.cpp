@@ -14,11 +14,13 @@ namespace RayTracer
     {
 		glm::vec3 hitNormal;
 		float hitDistance;
+		bool inside;
 
-		if (!RTMath::RaySphereIntersection(rayOrigin, rayDirection, 1.0f, hitNormal, hitDistance)) return false;
+		if (!RTMath::RaySphereIntersection(rayOrigin, rayDirection, 1.0f, hitNormal, hitDistance, inside)) return false;
 
 		hitInfo.hitDistance = hitDistance;
 		hitInfo.hitNormal = hitNormal;
+		hitInfo.insideObject = inside;
 		return true;
     }
 }

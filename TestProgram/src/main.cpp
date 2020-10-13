@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.5,-1.5 }, { 0,0.25,-2.85 });
+	Camera camera = RayTracer::Camera(300, 300, 45.0f, { 0,0,0 }, { 0,0,-3 }, 0.001);
 	Scene scene(camera);
 	
 
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 	ConstMaterial teapotMat1; teapotMat1.albedo = { 0.972, 0.960, 0.915 }; teapotMat1.emissiveness = { 0,0,0 }; teapotMat1.reflectiveness = 0.0f; teapotMat1.isTransparent = true; teapotMat1.refractiveIndex = 1.5f;
 	ConstMaterial teapotMat2; teapotMat2.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f }; teapotMat2.emissiveness = { 0,0,0 }; teapotMat2.reflectiveness = 0.1f; teapotMat2.isTransparent = false;
 	ConstMaterial teapotMat3; teapotMat3.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f }; teapotMat3.emissiveness = { 0,0,0 }; teapotMat3.reflectiveness = 0.1f; teapotMat3.isTransparent = false;
-	ConstMaterial floorMat; floorMat.albedo = { 86.0f / 255.0f,125.0f / 255.0f,70.0f / 255.0f }; floorMat.emissiveness = { 0.0f,0.0f,0.0f }; floorMat.reflectiveness = 0.0f; floorMat.isTransparent = false;
+	ConstMaterial floorMat; floorMat.albedo = { 1,1,0 };//{ 86.0f / 255.0f,125.0f / 255.0f,70.0f / 255.0f }; floorMat.emissiveness = { 0.0f,0.0f,0.0f }; floorMat.reflectiveness = 0.0f; floorMat.isTransparent = false;
 	ConstMaterial rightWallMat; rightWallMat.albedo = { 0,0,1 }; rightWallMat.emissiveness = { 0.0f,0.0f,0.0f }; rightWallMat.reflectiveness = 0.0f; rightWallMat.isTransparent = false;
 	ConstMaterial leftWallMat; leftWallMat.albedo = { 1,0,0 }; leftWallMat.emissiveness = { 0,0,0 }; leftWallMat.reflectiveness = 0.0f; leftWallMat.isTransparent = false;
 	ConstMaterial backWallMat; backWallMat.albedo = { 1,1,1 }; backWallMat.emissiveness = { 0,0,0 }; backWallMat.reflectiveness = 0.0f; backWallMat.isTransparent = false;
@@ -38,70 +38,70 @@ int main(int argc, char* argv[])
 	// Add area lights
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.48, -3 });
 	BoxLight boxLight1 = BoxLight(transform, { 1,0.01,1 }, &areaLightMat, { 1,1,1 }, 5.0f);
-	scene.AddLight(&boxLight1);
+	//scene.AddLight(&boxLight1);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 1.5, -3 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 1, 0.01, 1 });
-	scene.AddObject(&fakeLight1);
+	//scene.AddObject(&fakeLight1);
 
-	DirectionalLight sunLight = DirectionalLight({ -0.5,-1,-1 }, { 1,1,1 });
-	//scene.AddLight(&sunLight);
+	DirectionalLight sunLight = DirectionalLight({ 0,-1,-1 }, { 1,1,1 });
+	scene.AddLight(&sunLight);
 
 	// Load the meshes for the scene
 	Mesh teapotMesh = Mesh("teapot.obj", 11);
-	Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
+	//Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
 	//Mesh amphoraMesh = Mesh("amphora.obj", 10);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -3 });
+	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -13 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	transform = glm::rotate(transform, glm::radians(-35.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	//MeshInstance teapotInstance = MeshInstance(&teapotMesh, transform, &teapotMat1);
-	//scene.AddObject(&teapotInstance);
+	MeshInstance teapotInstance = MeshInstance(&teapotMesh, transform, &teapotMat2);
+	scene.AddObject(&teapotInstance);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.1, 0.05, -3 });
 	//transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	//transform = glm::rotate(transform, glm::radians(-35.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.2, 0.2, 0.2 });
-	MeshInstance bunnyInstance = MeshInstance(&bunnyMesh, transform, &teapotMat1);
-	scene.AddObject(&bunnyInstance);
+	//MeshInstance bunnyInstance = MeshInstance(&bunnyMesh, transform, &teapotMat1);
+	//scene.AddObject(&bunnyInstance);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.75, 0, -3.75 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	transform = glm::rotate(transform, glm::radians(-25.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	MeshInstance teapotInstance2 = MeshInstance(&teapotMesh, transform, &teapotMat2);
-	scene.AddObject(&teapotInstance2);
+	//MeshInstance teapotInstance2 = MeshInstance(&teapotMesh, transform, &teapotMat2);
+	//scene.AddObject(&teapotInstance2);
 
 	transform = glm::translate(glm::mat4(1.0f), { -0.75, 0, -3.75 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	transform = glm::rotate(transform, glm::radians(-155.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	MeshInstance teapotInstance3 = MeshInstance(&teapotMesh, transform, &teapotMat3);
-	scene.AddObject(&teapotInstance3);
+	//MeshInstance teapotInstance3 = MeshInstance(&teapotMesh, transform, &teapotMat3);
+	//scene.AddObject(&teapotInstance3);
 
 	// Add a test sphere
-	transform = glm::translate(glm::mat4(1.0f), { 0,0.3,-2.5 });
-	transform = glm::scale(transform, { 0.25, 0.25, 0.25 });
+	transform = glm::translate(glm::mat4(1.0f), { 0,0,-10 });
+	//transform = glm::scale(transform, { 0.25, 0.25, 0.25 });
 	Sphere sphere = Sphere(transform, &teapotMat1);
-	//scene.AddObject(&sphere);
+	scene.AddObject(&sphere);
 
 	// Add the floor and ceiling
-	transform = glm::translate(glm::mat4(1.0f), { 0,-0.025,-5 });
-	Box floor = Box(transform, &floorMat, { 20,0.05,20 });
+	transform = glm::translate(glm::mat4(1.0f), { 0,-2,-250 });
+	Box floor = Box(transform, &floorMat, { 200,0.5,500 });
 	scene.AddObject(&floor);
 
 	transform = glm::translate(glm::mat4(1.0f), { -1,0,0 });
 	Box leftWall = Box(transform, &leftWallMat, { 0.05, 2, 20 });
-	scene.AddObject(&leftWall);
+	//scene.AddObject(&leftWall);
 
 	transform = glm::translate(glm::mat4(1.0f), { 1,0,0 });
 	Box rightWall = Box(transform, &rightWallMat, { 0.05,2,20 });
-	scene.AddObject(&rightWall);
+	//scene.AddObject(&rightWall);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0,0,-10 });
 	Box backWall = Box(transform, &backWallMat, { 20,20,0.05 });
-	scene.AddObject(&backWall);
+	//scene.AddObject(&backWall);
 
 
 	// Render and save the image. The image saves in the TestProgram folder (when I run the project that's where VS puts it at least)

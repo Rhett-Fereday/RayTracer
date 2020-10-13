@@ -11,7 +11,7 @@ namespace RayTracer
 		
 		//Determine whether or not a ray intersects a sphere of a given radius.
 		//This method assumes the rayOrigin and rayDirection are in model space.
-		bool RaySphereIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const float & radius, glm::vec3 & hitNormal, float & hitDistance)
+		bool RaySphereIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const float & radius, glm::vec3 & hitNormal, float & hitDistance, bool &insideObject)
 		{
 			float a = dot(rayDirection, rayDirection);
 			float b = dot(2.0f * rayDirection, rayOrigin);
@@ -27,15 +27,23 @@ namespace RayTracer
 			u1 = (-b + root) / (2.0f * a);
 			u2 = (-b - root) / (2.0f * a);
 
-			if (u2 < u1) u1 = u2;
+			if (u2 < u1) std::swap(u1, u2);
 
-			// Account for floating point inaccuracy
-			if (u1 < 0.0001) return false;
+			if (u1 < 0.0001 && u2 < 0.0001) return false;
 
 			vec3 hitPosition = rayOrigin + rayDirection * u1;
-			hitNormal = normalize(hitPosition);
 			hitDistance = u1;
+			hitNormal = hitPosition;
 
+			if (u1 < 0.0001)
+			{
+				hitPosition = rayOrigin + rayDirection * u2;
+				hitDistance = u2;
+				hitNormal = -hitPosition;
+
+			}
+
+			hitNormal = normalize(hitNormal);
 			return true;
 		}
 
@@ -236,14 +244,26 @@ namespace RayTracer
 			}
 			else 
 			{
-				float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+				float cost = sqrtf(std::max(0.0f, 1.0f - sint * sint));
 				cosi = fabsf(cosi);
 				float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
 				float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-				reflectivePortion = (Rs * Rs + Rp * Rp) / 2;
+				reflectivePortion = (Rs * Rs + Rp * Rp) / 2.0f;
 			}
 
 			return reflectivePortion;
+		}
+
+		vec3 Refract(const vec3 &I, const vec3 &N, const float &ior)
+		{
+			float cosi = dot(I, N);
+			float etai = 1, etat = ior;
+			vec3 n = N;
+			if (cosi < 0) { cosi = -cosi; }
+			else { std::swap(etai, etat); n = -N; }
+			float eta = etai / etat;
+			float k = 1 - eta * eta * (1 - cosi * cosi);
+			return k < 0 ? vec3(0) : eta * I + (eta * cosi - sqrtf(k)) * n;
 		}
 	}
 }
