@@ -11,5 +11,6 @@ namespace RayTracer
 		glm::vec3 hitNormal;
 		ConstMaterial* hitMaterial;
 		float hitDistance;
+		bool insideObject = false;
 	};
 }

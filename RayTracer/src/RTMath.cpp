@@ -13,6 +13,7 @@ namespace RayTracer
 		//This method assumes the rayOrigin and rayDirection are in model space.
 		bool RaySphereIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const float & radius, glm::vec3 & hitNormal, float & hitDistance, bool &insideObject)
 		{
+			insideObject = false;
 			float a = dot(rayDirection, rayDirection);
 			float b = dot(2.0f * rayDirection, rayOrigin);
 			float c = dot(rayOrigin, rayOrigin) - (radius * radius);
@@ -40,15 +41,16 @@ namespace RayTracer
 				hitPosition = rayOrigin + rayDirection * u2;
 				hitDistance = u2;
 				hitNormal = -hitPosition;
-
+				insideObject = true;
 			}
 
 			hitNormal = normalize(hitNormal);
 			return true;
 		}
 
-		bool RayAABBIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const AABB& aabb, glm::vec3 &hitNormal, float & hitDistance)
+		bool RayAABBIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const AABB& aabb, glm::vec3 &hitNormal, float & hitDistance, bool &insideObject)
 		{
+			insideObject = false;
 			float tmin = (aabb.minDimensions.x - rayOrigin.x) / rayDirection.x;
 			float tmax = (aabb.maxDimensions.x - rayOrigin.x) / rayDirection.x;
 
@@ -110,15 +112,20 @@ namespace RayTracer
 
 			hitDistance = tmin;
 
-			if (tmin < 0.0001f) hitDistance = tmax;
+			if (tmin < 0.0001f)
+			{
+				hitDistance = tmax;
+				insideObject = true;
+			}
 
 			return true;
 		}
 
 		//Determine whether or not a ray intersects a triangle defined by the triangle data.
 		//This method assumes the rayOrigin and rayDirection are in model space.
-		bool RayTriangleIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const Triangle & triangle, glm::vec3 & hitNormal, float & hitDistance)
+		bool RayTriangleIntersection(const glm::vec3 & rayOrigin, const glm::vec3 & rayDirection, const Triangle & triangle, glm::vec3 & hitNormal, float & hitDistance, bool &insideObject)
 		{
+			insideObject = false;
 			float u, v;
 
 			glm::vec3 v0v1 = triangle.v1 - triangle.v0;
@@ -126,8 +133,9 @@ namespace RayTracer
 			glm::vec3 pvec = cross(rayDirection, v0v2);
 			float det = dot(v0v1, pvec);
 
-			//if (fabs(det) < 0.0001) return false;
-			if (det < 0.0001) return false;
+			if (fabs(det) < 0.0001) return false;
+			
+			if (det < 0.0001) insideObject = true;
 
 			float invDet = 1.0f / det;
 
@@ -144,7 +152,11 @@ namespace RayTracer
 
 			if (hitDistance < 0.0001) return false;
 
-			hitNormal = normalize((1.0f - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2);
+			hitNormal = (1.0f - u - v) * triangle.n0 + u * triangle.n1 + v * triangle.n2;
+
+			if (insideObject) hitNormal = -hitNormal;
+
+			hitNormal = glm::normalize(hitNormal);
 
 			return true;
 		}

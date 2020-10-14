@@ -78,15 +78,28 @@ namespace RayTracer
 		if (hitInformation.hitMaterial->isTransparent)
 		{
 			// Calculate the reflection and transmission rays. Use fresnel to determine reflection strength.
-			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
-			glm::vec3 transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, 1.0f / hitInformation.hitMaterial->refractiveIndex));
-			float reflectionStrength = RTMath::Fresnel(ray, hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex);
+			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));			
+			float reflectionStrength = RTMath::Fresnel(ray, (hitInformation.insideObject) ? -hitInformation.hitNormal : hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex);
 
 			// Trace the reflection ray
 			reflectionComponent = reflectionStrength * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
 
 			// Only trace the transmission ray if not internal reflection
-			if(reflectionStrength < 1.0f) transmissionComponent = (1.0f - reflectionStrength) * TraceRay(hitInformation.hitPosition + 0.001f * transmissionRay, transmissionRay, { 1,1,1 }, depth + 1);
+			if (reflectionStrength < 1.0f)
+			{
+				glm::vec3 transmissionRay;
+				
+				if (hitInformation.insideObject)
+				{
+					transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex));
+				}
+				else
+				{
+					transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, 1.0f / hitInformation.hitMaterial->refractiveIndex));
+				}
+
+				transmissionComponent = (1.0f - reflectionStrength) * TraceRay(hitInformation.hitPosition + 0.001f * transmissionRay, transmissionRay, { 1,1,1 }, depth + 1);
+			}
 
 			outputColor = glm::clamp(reflectionComponent + transmissionComponent, { 0,0,0 }, { 1,1,1 });
 		}

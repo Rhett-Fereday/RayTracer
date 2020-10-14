@@ -82,8 +82,9 @@ namespace RayTracer
 
 		float tempDistance;
 		glm::vec3 tempNormal;
+		bool tempInside;
 		// Didn't hit the volume
-		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, *volume, tempNormal, tempDistance)) return false;
+		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, *volume, tempNormal, tempDistance, tempInside)) return false;
 
 		// Leaf volume, check triangles
 		if (currentIndex >= m_firstLeafIndex)
@@ -123,8 +124,9 @@ namespace RayTracer
 			RTMath::Triangle triangle = m_mesh->GetTriangleData((*indices)[i].first, (*indices)[i].second);
 			glm::vec3 tempNormal;
 			float tempDistance = 1000000.0f;
+			bool tempInside;
 
-			if (RTMath::RayTriangleIntersection(rayOrigin,rayDirection, triangle, tempNormal, tempDistance))
+			if (RTMath::RayTriangleIntersection(rayOrigin,rayDirection, triangle, tempNormal, tempDistance, tempInside))
 			{
 				if (tempDistance < closestHit)
 				{
@@ -132,6 +134,7 @@ namespace RayTracer
 					closestHit = tempDistance;
 					hitInfo.hitDistance = tempDistance;
 					hitInfo.hitNormal = tempNormal;
+					hitInfo.insideObject = tempInside;
 				}
 			}
 		}

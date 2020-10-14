@@ -21,11 +21,13 @@ namespace RayTracer
 	{
 		float hitDistance;
 		glm::vec3 hitNormal;
+		bool inside;
 
-		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, m_aabb, hitNormal, hitDistance)) return false;
+		if (!RTMath::RayAABBIntersection(rayOrigin, rayDirection, m_aabb, hitNormal, hitDistance, inside)) return false;
 
 		hitInfo.hitDistance = hitDistance;
 		hitInfo.hitNormal = hitNormal;
+		hitInfo.insideObject = inside;
 		return true;
 	}
 
@@ -61,8 +63,9 @@ namespace RayTracer
 
 		glm::vec3 tempNormal;
 		float distance;
+		bool inside;
 
-		RTMath::RayAABBIntersection({ transformedPoint.x, transformedPoint.y, transformedPoint.z }, { transformedDirection.x, transformedDirection.y, transformedDirection.z }, m_aabb, tempNormal, distance);
+		RTMath::RayAABBIntersection({ transformedPoint.x, transformedPoint.y, transformedPoint.z }, { transformedDirection.x, transformedDirection.y, transformedDirection.z }, m_aabb, tempNormal, distance, inside);
 
 		m_surfacePoint = point + m_randomDirection * distance;
 

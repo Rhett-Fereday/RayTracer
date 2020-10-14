@@ -23,11 +23,13 @@ namespace RayTracer
 	{
 		float hitDistance;
 		glm::vec3 hitNormal;
+		bool inside;
 
-		if(!RTMath::RayAABBIntersection(rayOrigin, rayDirection, m_aabb, hitNormal, hitDistance)) return false;
+		if(!RTMath::RayAABBIntersection(rayOrigin, rayDirection, m_aabb, hitNormal, hitDistance, inside)) return false;
 		
 		hitInfo.hitDistance = hitDistance;
 		hitInfo.hitNormal = hitNormal;
+		hitInfo.insideObject = inside;
 		return true;
 	}
 }
