@@ -112,6 +112,20 @@ namespace RayTracer
 			if (hitInformation.hitMaterial->reflectiveness > 0)
 			{
 				glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
+
+				if (hitInformation.hitMaterial->lobeAngle > 0.0f)
+				{
+					// Calculate random reflection ray in cone about perfect reflection
+					glm::vec3 offsetPoint = hitInformation.hitPosition + reflectionRay;
+					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->lobeAngle / 4.0f));
+					float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+					float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+					float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+
+					offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
+					reflectionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
+				}
+
 				reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
 			}
 
