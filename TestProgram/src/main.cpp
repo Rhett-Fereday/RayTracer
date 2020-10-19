@@ -25,10 +25,10 @@ int main(int argc, char* argv[])
 	
 
 	// Create the materials to be used in the scene
-	ConstMaterial teapotMat1; teapotMat1.albedo = { 0.972, 0.960, 0.915 }; teapotMat1.emissiveness = { 0,0,0 }; teapotMat1.reflectiveness = 0.0f; teapotMat1.isTransparent = true; teapotMat1.refractiveIndex = 1.5f;
+	ConstMaterial teapotMat1; teapotMat1.albedo = { 0.972, 0.960, 0.915 }; teapotMat1.emissiveness = { 0,0,0 }; teapotMat1.reflectiveness = 0.0f; teapotMat1.isTransparent = true; teapotMat1.refractiveIndex = 1.5f; teapotMat1.reflectionLobeAngle = 0.0f; teapotMat1.transmissionLobeAngle = 3.0f;
 	ConstMaterial teapotMat2; teapotMat2.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f }; teapotMat2.emissiveness = { 0,0,0 }; teapotMat2.reflectiveness = 0.1f; teapotMat2.isTransparent = false;
 	ConstMaterial teapotMat3; teapotMat3.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f }; teapotMat3.emissiveness = { 0,0,0 }; teapotMat3.reflectiveness = 0.1f; teapotMat3.isTransparent = false;
-	ConstMaterial floorMat; floorMat.albedo = { 86.0f / 255.0f,125.0f / 255.0f,70.0f / 255.0f }; floorMat.emissiveness = { 0.0f,0.0f,0.0f }; floorMat.reflectiveness = 1.0f; floorMat.isTransparent = false; floorMat.lobeAngle = 11.0f;
+	ConstMaterial floorMat; floorMat.albedo = { 86.0f / 255.0f,125.0f / 255.0f,70.0f / 255.0f }; floorMat.emissiveness = { 0.0f,0.0f,0.0f }; floorMat.reflectiveness = 0.0f; floorMat.isTransparent = false; floorMat.reflectionLobeAngle = 11.0f;
 	ConstMaterial rightWallMat; rightWallMat.albedo = { 0,0,1 }; rightWallMat.emissiveness = { 0.0f,0.0f,0.0f }; rightWallMat.reflectiveness = 0.0f; rightWallMat.isTransparent = false;
 	ConstMaterial leftWallMat; leftWallMat.albedo = { 1,0,0 }; leftWallMat.emissiveness = { 0,0,0 }; leftWallMat.reflectiveness = 0.0f; leftWallMat.isTransparent = false;
 	ConstMaterial backWallMat; backWallMat.albedo = { 0.8,0,0 }; backWallMat.emissiveness = { 0,0,0 }; backWallMat.reflectiveness = 0.0f; backWallMat.isTransparent = false;
@@ -45,21 +45,21 @@ int main(int argc, char* argv[])
 	Box fakeLight1 = Box(transform, &areaLightMat, { 1, 0.01, 1 });
 	//scene.AddObject(&fakeLight1);
 
-	DirectionalLight sunLight = DirectionalLight({ 0,-1,-1 }, { 1,1,1 });
-	//scene.AddLight(&sunLight);
+	DirectionalLight sunLight = DirectionalLight({ 0,-1,-1 }, { 1,1,1 }, 2.0f);
+	scene.AddLight(&sunLight);
 
 	// Load the meshes for the scene
-	//Mesh teapotMesh = Mesh("teapot.obj", 11);
+	Mesh teapotMesh = Mesh("teapot.obj", 11);
 	//Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
-	//Mesh teacupMesh = Mesh("teacup.obj", 14);
+	Mesh teacupMesh = Mesh("teacup.obj", 14);
 	//Mesh amphoraMesh = Mesh("amphora.obj", 10);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -3 });
 	//transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	//transform = glm::rotate(transform, glm::radians(-35.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.05, 0.05, 0.05 });
-	//MeshInstance teacupInstance = MeshInstance(&teacupMesh, transform, &teapotMat1);
-	//scene.AddObject(&teacupInstance);
+	MeshInstance teacupInstance = MeshInstance(&teacupMesh, transform, &teapotMat1);
+	scene.AddObject(&teacupInstance);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.1, 0.05, -3 });
 	//transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
@@ -75,12 +75,12 @@ int main(int argc, char* argv[])
 	//MeshInstance teapotInstance2 = MeshInstance(&teapotMesh, transform, &teapotMat2);
 	//scene.AddObject(&teapotInstance2);
 
-	transform = glm::translate(glm::mat4(1.0f), { -0.75, 0, -3.75 });
+	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -3.75 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	transform = glm::rotate(transform, glm::radians(-155.0f), { 0,0,1 });
 	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	//MeshInstance teapotInstance3 = MeshInstance(&teapotMesh, transform, &teapotMat3);
-	//scene.AddObject(&teapotInstance3);
+	MeshInstance teapotInstance3 = MeshInstance(&teapotMesh, transform, &teapotMat3);
+	scene.AddObject(&teapotInstance3);
 
 	// Add a test sphere
 	transform = glm::translate(glm::mat4(1.0f), { 0,0.5,-10 });
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
 	transform = glm::translate(glm::mat4(1.0f), { 0,0.3,-5 });
 	Box glowCube = Box(transform, &glowCubeMat, { 0.5,0.5,0.5 });
-	scene.AddObject(&glowCube);
+	//scene.AddObject(&glowCube);
 
 
 	// Render and save the image. The image saves in the TestProgram folder (when I run the project that's where VS puts it at least)

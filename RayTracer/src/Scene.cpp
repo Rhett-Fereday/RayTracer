@@ -81,6 +81,19 @@ namespace RayTracer
 			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));			
 			float reflectionStrength = RTMath::Fresnel(ray, (hitInformation.insideObject) ? -hitInformation.hitNormal : hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex);
 
+			if (hitInformation.hitMaterial->reflectionLobeAngle > 0.0f)
+			{
+				// Calculate random reflection ray in cone about perfect reflection
+				glm::vec3 offsetPoint = hitInformation.hitPosition + reflectionRay;
+				float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->reflectionLobeAngle / 4.0f));
+				float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+				float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+				float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+
+				offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
+				reflectionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
+			}
+
 			// Trace the reflection ray
 			reflectionComponent = reflectionStrength * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
 
@@ -98,6 +111,19 @@ namespace RayTracer
 					transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, 1.0f / hitInformation.hitMaterial->refractiveIndex));
 				}
 
+				if (hitInformation.hitMaterial->transmissionLobeAngle > 0)
+				{
+					// Calculate random transmission ray in cone about perfect transmission
+					glm::vec3 offsetPoint = hitInformation.hitPosition + transmissionRay;
+					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->transmissionLobeAngle / 4.0f));
+					float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+					float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+					float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
+
+					offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
+					transmissionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
+				}
+
 				transmissionComponent = (1.0f - reflectionStrength) * TraceRay(hitInformation.hitPosition + 0.001f * transmissionRay, transmissionRay, { 1,1,1 }, depth + 1);
 			}
 
@@ -113,11 +139,11 @@ namespace RayTracer
 			{
 				glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
 
-				if (hitInformation.hitMaterial->lobeAngle > 0.0f)
+				if (hitInformation.hitMaterial->reflectionLobeAngle > 0.0f)
 				{
 					// Calculate random reflection ray in cone about perfect reflection
 					glm::vec3 offsetPoint = hitInformation.hitPosition + reflectionRay;
-					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->lobeAngle / 4.0f));
+					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->reflectionLobeAngle / 4.0f));
 					float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
 					float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
 					float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));

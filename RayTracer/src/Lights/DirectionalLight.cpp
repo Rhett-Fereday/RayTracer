@@ -18,7 +18,7 @@ namespace RayTracer
 
 		if (incidence > 0.0f)
 		{
-			returnIntensity = m_color * incidence;
+			returnIntensity = m_color * incidence * m_intensity;
 		}
 
 		return returnIntensity;

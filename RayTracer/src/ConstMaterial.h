@@ -13,6 +13,7 @@ namespace RayTracer
 		float reflectiveness = 0.0f;
 		bool isTransparent = false;
 		float refractiveIndex = 1.5f;
-		float lobeAngle = 0.0f;
+		float reflectionLobeAngle = 0.0f;
+		float transmissionLobeAngle = 0.0f;
 	};
 }
