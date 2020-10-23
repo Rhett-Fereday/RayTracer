@@ -46,119 +46,34 @@ namespace RayTracer
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;
 
-		// An object was hit - determine its lighting
-		for (int i = 0; i < m_lights.size(); i++)
-		{			
-			glm::vec3 shadowRay = m_lights[i]->DirectionToLight(hitInformation.hitPosition);
-			HitInfo occlusionInformation;
-			bool isOccluded = TestIntersection(hitInformation.hitPosition + 0.001f * shadowRay, shadowRay, occlusionInformation, false);
-
-			// Object might be occluded for this light
-			if (isOccluded)
-			{
-				// Was the intersection between the ray origin and the light?
-				if (occlusionInformation.hitDistance < m_lights[i]->DistanceToLight(hitInformation.hitPosition))
-				{
-					continue;
-				}
-			}
-
-			// Calculate illumination for this light at the object collision point
-			intensity += m_lights[i]->Illumination(hitInformation.hitPosition, hitInformation.hitNormal, ray);
-		}
-
-		// Gotta clamp. Bad things happen when we don't clamp.
-		glm::vec3 clampedIntensity = glm::clamp(intensity, { 0,0,0 }, { 1,1,1 });
-		glm::vec3 diffuseComponent = { 0,0,0 };// clampedIntensity * hitInformation.hitMaterial->albedo * (1 - hitInformation.hitMaterial->reflectiveness);
-		glm::vec3 reflectionComponent = { 0,0,0 }; // Must initialize to 0. It does so by default when compiling with VS2017. Not true for VS2019...
-		glm::vec3 transmissionComponent = { 0,0,0 };
-		glm::vec3 outputColor = { 0,0,0 };
-
-		// Handle transparency
-		if (hitInformation.hitMaterial->isTransparent)
+		// We hit a luminaire
+		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			// Calculate the reflection and transmission rays. Use fresnel to determine reflection strength.
-			glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));			
-			float reflectionStrength = RTMath::Fresnel(ray, (hitInformation.insideObject) ? -hitInformation.hitNormal : hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex);
+			//float luminance = glm::dot(hitInformation.hitNormal, ray) * hitInformation.hitMaterial->emissiveStrength / (distance * distance);
+			float luminance = hitInformation.hitMaterial->emissiveStrength;
 
-			if (hitInformation.hitMaterial->reflectionLobeAngle > 0.0f)
-			{
-				// Calculate random reflection ray in cone about perfect reflection
-				glm::vec3 offsetPoint = hitInformation.hitPosition + reflectionRay;
-				float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->reflectionLobeAngle / 4.0f));
-				float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-				float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-				float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-
-				offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
-				reflectionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
-			}
-
-			// Trace the reflection ray
-			reflectionComponent = reflectionStrength * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
-
-			// Only trace the transmission ray if not internal reflection
-			if (reflectionStrength < 1.0f)
-			{
-				glm::vec3 transmissionRay;
-				
-				if (hitInformation.insideObject)
-				{
-					transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, hitInformation.hitMaterial->refractiveIndex));
-				}
-				else
-				{
-					transmissionRay = glm::normalize(glm::refract(ray, hitInformation.hitNormal, 1.0f / hitInformation.hitMaterial->refractiveIndex));
-				}
-
-				if (hitInformation.hitMaterial->transmissionLobeAngle > 0)
-				{
-					// Calculate random transmission ray in cone about perfect transmission
-					glm::vec3 offsetPoint = hitInformation.hitPosition + transmissionRay;
-					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->transmissionLobeAngle / 4.0f));
-					float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-					float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-					float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-
-					offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
-					transmissionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
-				}
-
-				transmissionComponent = (1.0f - reflectionStrength) * TraceRay(hitInformation.hitPosition + 0.001f * transmissionRay, transmissionRay, { 1,1,1 }, depth + 1);
-			}
-
-			outputColor = glm::clamp(reflectionComponent + transmissionComponent, { 0,0,0 }, { 1,1,1 });
-		}
-		else
-		{
-			// Handle fully diffuse and partially reflective objects
-			diffuseComponent = clampedIntensity * hitInformation.hitMaterial->albedo * (1.0f - hitInformation.hitMaterial->reflectiveness);
-
-			// Only bother with reflection if it matters
-			if (hitInformation.hitMaterial->reflectiveness > 0)
-			{
-				glm::vec3 reflectionRay = glm::normalize(glm::reflect(ray, hitInformation.hitNormal));
-
-				if (hitInformation.hitMaterial->reflectionLobeAngle > 0.0f)
-				{
-					// Calculate random reflection ray in cone about perfect reflection
-					glm::vec3 offsetPoint = hitInformation.hitPosition + reflectionRay;
-					float maxOffsetDistance = glm::tan(glm::radians(hitInformation.hitMaterial->reflectionLobeAngle / 4.0f));
-					float xOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-					float yOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-					float zOffset = -maxOffsetDistance + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxOffsetDistance - -maxOffsetDistance)));
-
-					offsetPoint = offsetPoint + glm::vec3(xOffset, yOffset, zOffset);
-					reflectionRay = glm::normalize(offsetPoint - hitInformation.hitPosition);
-				}
-
-				reflectionComponent = hitInformation.hitMaterial->reflectiveness * TraceRay(hitInformation.hitPosition + 0.001f * reflectionRay, reflectionRay, { 1,1,1 }, depth + 1);
-			}
-
-			outputColor = glm::clamp(diffuseComponent + reflectionComponent + hitInformation.hitMaterial->emissiveness, { 0,0,0 }, { 1,1,1 });
+			return luminance * hitInformation.hitMaterial->albedo;
 		}
 
-		return outputColor;
+		// Calculate orthonormal basis from the hitNormal
+		glm::vec3 w = hitInformation.hitNormal;
+		glm::vec3 u = { 0,-w.z,w.y };
+		glm::vec3 v = glm::cross(w, u);
+
+		// Generate two random floats in range [0,1]
+		float rand1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float rand2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+		// Calculate the x, y, and z components of a new random ray assuming a lambertian BRDF
+		float x = glm::cos(2.0f * 2.14f * rand1) * sqrt(rand2);
+		float y = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
+		float z = sqrt(1.0f - rand2);
+
+		glm::vec3 newRay = glm::normalize(glm::vec3(x, y, z));
+
+		//glm::vec3 lighting = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
+
+		return TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1) * hitInformation.hitMaterial->albedo / (hitInformation.hitDistance * hitInformation.hitDistance);
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.
