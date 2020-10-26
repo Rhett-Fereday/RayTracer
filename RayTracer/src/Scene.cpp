@@ -3,8 +3,9 @@
 
 namespace RayTracer
 {
-	Scene::Scene(Camera camera) : m_camera(camera)
+	Scene::Scene(Camera* camera)
 	{
+		m_camera = camera;
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
 		m_recursionLimit = 20;
@@ -22,12 +23,12 @@ namespace RayTracer
 
 	void Scene::RenderScene()
 	{
-		m_camera.Render(this);
+		m_camera->Render(this);
 	}
 	
 	void Scene::SaveScene(const char* filename)
 	{
-		m_camera.GetRenderTarget().save(filename);
+		m_camera->GetRenderTarget().save(filename);
 	}
 
 	// Primary method for ray-tracing the scene
@@ -78,7 +79,7 @@ namespace RayTracer
 
 		glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
 
-		glm::vec3 lighting = (glm::dot(hitInformation.hitNormal, -ray) * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1)) / (hitInformation.hitDistance * hitInformation.hitDistance);
+		glm::vec3 lighting = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
 
 		return lighting * hitInformation.hitMaterial->albedo;
 	}

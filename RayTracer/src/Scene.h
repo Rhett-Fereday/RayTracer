@@ -14,14 +14,14 @@ namespace RayTracer
 	friend class Camera;
 
 	public:
-		Scene(Camera camera);
+		Scene(Camera* camera);
 		void AddObject(Object* object);
 		void AddLight(Light* light);
 		void RenderScene();
 		void SaveScene(const char* filename);
 
 	private:
-		Camera m_camera;
+		Camera* m_camera;
 		std::vector<Object*> m_objects;
 		std::vector<Light*> m_lights;
 		int m_recursionLimit;

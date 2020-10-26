@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	// Create the camera and create a scene with it
 
 	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.75,2 }, { 0,0.75,0 }, 0.0001);
-	Scene scene(camera);
+	Scene scene(&camera);
 	
 
 	// Create the materials to be used in the scene
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 }; whiteMat.emissiveColor = { 0.0f,0.0f,0.0f }; whiteMat.reflectiveness = 0.0f; whiteMat.isTransparent = false;
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545,0,0 }; redWallMat.emissiveColor = { 0,0,0 }; redWallMat.reflectiveness = 0.0f; redWallMat.isTransparent = false;
 	ConstMaterial backWallMat; backWallMat.albedo = { 0.8,0,0 }; backWallMat.emissiveColor = { 0,0,0 }; backWallMat.reflectiveness = 0.0f; backWallMat.isTransparent = false;
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 100.0f;
+	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 30.0f;
 	ConstMaterial glowCubeMat; glowCubeMat.albedo = { 0,1,0 }; glowCubeMat.emissiveColor = { 0,1,0 };
 
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	//scene.AddLight(&boxLight1);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 1.5, 0 });
-	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.01, 0.5 });
+	Box fakeLight1 = Box(transform, &areaLightMat, { 0.25, 0.01, 0.25 });
 	scene.AddObject(&fakeLight1);
 
 	PointLight pointLight = PointLight({ 1,1,1 }, 10, { 0, 0.75, 0 });

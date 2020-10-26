@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include "CImg.h"
 #include "Core.h"
+#include <mutex>
 
 namespace RayTracer
 {
@@ -20,10 +21,13 @@ namespace RayTracer
 		cimg_library::CImg<unsigned char> GetRenderTarget();
 
 	private:
-		unsigned int m_width, m_height, m_raysPerPixel;
+		unsigned int m_width, m_height, m_raysPerPixel, m_numberOfThreads;
 		float m_fov, m_focalDistance, m_lensRadius;
 		glm::vec3 m_position;
 		glm::mat4 m_worldToCamera, m_cameraToWorld;
 		cimg_library::CImg<unsigned char> m_renderTarget;
+		std::mutex m_renderMutex;
+
+		void ThreadRender(Scene* scene, int threadID);
 	};
 }

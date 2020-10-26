@@ -4,6 +4,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
+#include <thread>
 #include <cstdlib>
 #include <ctime>
 
@@ -15,7 +16,8 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 8;
+		m_raysPerPixel = 16;
+		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
 	}
@@ -23,18 +25,52 @@ namespace RayTracer
     // Cast the camera rays into the scene. Code set up from scratchapixel.com with modifications to support camera transforms
 	void Camera::Render(Scene* scene)
 	{
-        float widthInverse = 1 / float(m_width);
-        float heightInverse = 1 / float(m_height);
-        float fieldOfView = m_fov;
-        float aspectRatio = float(m_width) / float(m_height);
-        float angle = tan(3.14 * 0.5f * fieldOfView / 180.0f);
-
 		srand(static_cast <unsigned> (time(0)));
+		std::thread *threads = new std::thread[m_numberOfThreads];
 
-        for (int y = 0; y < m_height; y++)
-        {
-            for (int x = 0; x < m_width; x++)
-            {
+		for (int i = 0; i < m_numberOfThreads; i++)
+		{
+			threads[i] = std::thread(&Camera::ThreadRender, this, scene, i);
+		}
+
+		for (int t = 0; t < m_numberOfThreads; t++)
+		{
+			threads[t].join();
+		}
+	}
+	
+	cimg_library::CImg<unsigned char> Camera::GetRenderTarget()
+	{
+		return m_renderTarget;
+	}
+
+	void Camera::ThreadRender(Scene * scene, int threadID)
+	{
+		int maxConcurrentThreads = m_numberOfThreads;
+		int numTilesWide = sqrt(maxConcurrentThreads);
+		int numTilesHigh = numTilesWide;
+
+		// If the maxConcurrentThreads isn't a perfect square we must handle it
+		if ((maxConcurrentThreads - numTilesWide * numTilesWide) > 0) numTilesHigh = maxConcurrentThreads / numTilesWide;
+
+		int tilePixelWidth = m_width / numTilesWide;
+		int tilePixelHeight = m_height / numTilesHigh;
+
+		int tilePixelWidthStartIndex = (threadID % numTilesWide)  * tilePixelWidth;
+		int tilePixelWidthEndIndex = (threadID % numTilesWide) * tilePixelWidth + tilePixelWidth;
+		int tilePixelHeightStartIndex = (int)(threadID / numTilesWide) * tilePixelHeight;
+		int tilePixelHeightEndIndex = (int)(threadID / numTilesWide) * tilePixelHeight + tilePixelHeight;
+
+		float widthInverse = 1 / float(m_width);
+		float heightInverse = 1 / float(m_height);
+		float fieldOfView = m_fov;
+		float aspectRatio = float(m_width) / float(m_height);
+		float angle = tan(3.14 * 0.5f * fieldOfView / 180.0f);
+
+		for (int y = tilePixelHeightStartIndex; y < tilePixelHeightEndIndex; y++)
+		{
+			for (int x = tilePixelWidthStartIndex; x < tilePixelWidthEndIndex; x++)
+			{
 				glm::vec3 color = { 0,0,0 };
 
 				for (int r = 0; r < m_raysPerPixel; r++)
@@ -53,7 +89,7 @@ namespace RayTracer
 
 					// Calculate random origin on the lens
 					float radius = static_cast <float>(rand()) / static_cast <float>(RAND_MAX);
-					float theta = (static_cast <float>(rand()) / static_cast <float>(RAND_MAX)) * 2.0f * 3.14f;					
+					float theta = (static_cast <float>(rand()) / static_cast <float>(RAND_MAX)) * 2.0f * 3.14f;
 					glm::vec3 originOnLens = m_lensRadius * glm::vec3(radius * cos(theta), radius * sin(theta), 0);
 
 					glm::vec3 focusedRay = focusPlanePoint - originOnLens;
@@ -71,19 +107,18 @@ namespace RayTracer
 
 				color = color / float(m_raysPerPixel);
 
-                // Clamp returned value just to be safe
-				glm::vec3 clampedColor = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
+				// Clamp returned value just to be safe
+				glm::vec3 clampedColor = color;//glm::clamp(color, { 0,0,0 }, { 1,1,1 });
 
-                // Store in the cimg object
-                m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
-                m_renderTarget(x, y, 0, 1) = (unsigned char)(clampedColor.g * 255);
-                m_renderTarget(x, y, 0, 2) = (unsigned char)(clampedColor.b * 255);
-            }
-        }
-	}
-	
-	cimg_library::CImg<unsigned char> Camera::GetRenderTarget()
-	{
-		return m_renderTarget;
+				m_renderMutex.lock();
+
+				// Store in the cimg object
+				m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
+				m_renderTarget(x, y, 0, 1) = (unsigned char)(clampedColor.g * 255);
+				m_renderTarget(x, y, 0, 2) = (unsigned char)(clampedColor.b * 255);
+
+				m_renderMutex.unlock();
+			}
+		}
 	}
 }
