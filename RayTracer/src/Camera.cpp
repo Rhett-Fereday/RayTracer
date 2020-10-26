@@ -16,7 +16,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 16;
+		m_raysPerPixel = 1024;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
@@ -28,12 +28,14 @@ namespace RayTracer
 		srand(static_cast <unsigned> (time(0)));
 		std::thread *threads = new std::thread[m_numberOfThreads];
 
-		for (int i = 0; i < m_numberOfThreads; i++)
+		for (int i = 0; i < m_numberOfThreads - 1; i++)
 		{
 			threads[i] = std::thread(&Camera::ThreadRender, this, scene, i);
 		}
 
-		for (int t = 0; t < m_numberOfThreads; t++)
+		ThreadRender(scene, m_numberOfThreads - 1);
+
+		for (int t = 0; t < m_numberOfThreads - 1; t++)
 		{
 			threads[t].join();
 		}
@@ -61,10 +63,11 @@ namespace RayTracer
 		int tilePixelHeightStartIndex = (int)(threadID / numTilesWide) * tilePixelHeight;
 		int tilePixelHeightEndIndex = (int)(threadID / numTilesWide) * tilePixelHeight + tilePixelHeight;
 
-		float widthInverse = 1 / float(m_width);
-		float heightInverse = 1 / float(m_height);
+		float fwidth = m_width;
+		float widthInverse = 1.0f / fwidth;
+		float heightInverse = 1.0f / (float)m_height;
 		float fieldOfView = m_fov;
-		float aspectRatio = float(m_width) / float(m_height);
+		float aspectRatio = (float)m_width / (float)m_height;
 		float angle = tan(3.14 * 0.5f * fieldOfView / 180.0f);
 
 		for (int y = tilePixelHeightStartIndex; y < tilePixelHeightEndIndex; y++)
