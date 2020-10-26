@@ -7,7 +7,7 @@ namespace RayTracer
 	{
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
-		m_recursionLimit = 5;
+		m_recursionLimit = 20;
 	}
 
 	void Scene::AddObject(Object* object)
@@ -49,7 +49,8 @@ namespace RayTracer
 		// We hit a luminaire
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			//float luminance = glm::dot(hitInformation.hitNormal, ray) * hitInformation.hitMaterial->emissiveStrength / (distance * distance);
+			//float luminance = glm::dot(hitInformation.hitNormal, -ray) * hitInformation.hitMaterial->emissiveStrength;
+			//float luminance = hitInformation.hitMaterial->emissiveStrength / (hitInformation.hitDistance * hitInformation.hitDistance);
 			float luminance = hitInformation.hitMaterial->emissiveStrength;
 
 			return luminance * hitInformation.hitMaterial->albedo;
@@ -57,7 +58,13 @@ namespace RayTracer
 
 		// Calculate orthonormal basis from the hitNormal
 		glm::vec3 w = hitInformation.hitNormal;
-		glm::vec3 u = { 0,-w.z,w.y };
+
+		//glm::vec3 planePoint = { 1,1, (glm::dot(w, hitInformation.hitPosition) - w.x - w.y) / w.z };
+
+		//glm::vec3 u = planePoint - hitInformation.hitPosition;
+
+		glm::vec3 u = { w.z - w.y, w.x - w.z, w.y - w.x };
+
 		glm::vec3 v = glm::cross(w, u);
 
 		// Generate two random floats in range [0,1]
@@ -65,15 +72,15 @@ namespace RayTracer
 		float rand2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
 		// Calculate the x, y, and z components of a new random ray assuming a lambertian BRDF
-		float x = glm::cos(2.0f * 2.14f * rand1) * sqrt(rand2);
-		float y = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
-		float z = sqrt(1.0f - rand2);
+		float a = glm::cos(2.0f * 3.14f * rand1) * sqrt(rand2);
+		float b = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
+		float c = sqrt(1.0f - rand2);
 
-		glm::vec3 newRay = glm::normalize(glm::vec3(x, y, z));
+		glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
 
-		//glm::vec3 lighting = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
+		glm::vec3 lighting = (glm::dot(hitInformation.hitNormal, -ray) * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1)) / (hitInformation.hitDistance * hitInformation.hitDistance);
 
-		return TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1) * hitInformation.hitMaterial->albedo / (hitInformation.hitDistance * hitInformation.hitDistance);
+		return lighting * hitInformation.hitMaterial->albedo;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.

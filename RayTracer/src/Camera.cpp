@@ -15,7 +15,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 16;
+		m_raysPerPixel = 8;
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
 	}
@@ -72,7 +72,7 @@ namespace RayTracer
 				color = color / float(m_raysPerPixel);
 
                 // Clamp returned value just to be safe
-                glm::vec3 clampedColor = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
+				glm::vec3 clampedColor = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
 
                 // Store in the cimg object
                 m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
