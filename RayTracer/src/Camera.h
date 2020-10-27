@@ -6,6 +6,7 @@
 #include "CImg.h"
 #include "Core.h"
 #include <mutex>
+#include <queue>
 
 namespace RayTracer
 {
@@ -27,7 +28,8 @@ namespace RayTracer
 		glm::mat4 m_worldToCamera, m_cameraToWorld;
 		cimg_library::CImg<unsigned char> m_renderTarget;
 		std::mutex m_renderMutex;
+		std::queue<std::pair<int, int>> m_renderQueue;
 
-		void ThreadRender(Scene* scene, int threadID);
+		void ThreadRender(Scene* scene);
 	};
 }
