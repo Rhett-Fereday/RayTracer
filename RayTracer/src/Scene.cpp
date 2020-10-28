@@ -50,11 +50,17 @@ namespace RayTracer
 		// We hit a luminaire
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			//float luminance = glm::dot(hitInformation.hitNormal, -ray) * hitInformation.hitMaterial->emissiveStrength;
-			//float luminance = hitInformation.hitMaterial->emissiveStrength / (hitInformation.hitDistance * hitInformation.hitDistance);
-			float luminance = hitInformation.hitMaterial->emissiveStrength;
+			// Calculate the incidence between the ray and the emissive surface normal. Attenuate by distance squared
+			
+			float lightIntensity = hitInformation.hitMaterial->emissiveStrength;
 
-			return luminance * hitInformation.hitMaterial->albedo;
+			if (depth > 1)
+			{
+				float incidence = glm::dot(hitInformation.hitNormal, -ray);
+				lightIntensity = (incidence * hitInformation.hitMaterial->emissiveStrength) / (hitInformation.hitDistance * hitInformation.hitDistance);
+			}
+
+			return lightIntensity * hitInformation.hitMaterial->albedo;
 		}
 
 		// Calculate orthonormal basis from the hitNormal
@@ -79,7 +85,15 @@ namespace RayTracer
 
 		glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
 
-		glm::vec3 lighting = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
+		float lightIntensity = 1.0f;
+
+		/*if (depth > 1)
+		{
+			float incidence = glm::dot(hitInformation.hitNormal, -ray);
+			lightIntensity = incidence / (hitInformation.hitDistance * hitInformation.hitDistance);
+		}*/
+
+		glm::vec3 lighting = lightIntensity * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
 
 		return lighting * hitInformation.hitMaterial->albedo;
 	}

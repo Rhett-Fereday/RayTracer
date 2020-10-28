@@ -7,6 +7,9 @@
     <Filter Include="Objects">
       <UniqueIdentifier>{CF2649B1-3B06-C84C-441E-5323B07C2EAE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PostProcesses">
+      <UniqueIdentifier>{42D5AA1C-AE95-2653-77D0-6FD0E34F6B2F}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BVH.h" />
@@ -47,6 +50,12 @@
     </ClInclude>
     <ClInclude Include="src\Objects\Sphere.h">
       <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcesses\NaiveReinhard.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcesses\PostProcess.h">
+      <Filter>PostProcesses</Filter>
     </ClInclude>
     <ClInclude Include="src\RTMath.h" />
     <ClInclude Include="src\ResourceManager.h" />
@@ -89,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="src\Objects\Sphere.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcesses\NaiveReinhard.cpp">
+      <Filter>PostProcesses</Filter>
     </ClCompile>
     <ClCompile Include="src\RTMath.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />

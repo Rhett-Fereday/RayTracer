@@ -11,6 +11,7 @@
 #include "Lights/PointLight.h"
 #include "Lights/SpotLight.h"
 #include "Lights/BoxLight.h"
+#include "PostProcesses/NaiveReinhard.h"
 #include <time.h>
 #include <iostream>
 
@@ -21,6 +22,10 @@ int main(int argc, char* argv[])
 	// Create the camera and create a scene with it
 
 	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.75,2 }, { 0,0.75,0 }, 0.0001);
+
+	NaiveReinhard toneMapper = NaiveReinhard();
+	camera.AddPostProcess(&toneMapper);
+
 	Scene scene(&camera);
 	
 
@@ -32,7 +37,7 @@ int main(int argc, char* argv[])
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 }; whiteMat.emissiveColor = { 0.0f,0.0f,0.0f }; whiteMat.reflectiveness = 0.0f; whiteMat.isTransparent = false;
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545,0,0 }; redWallMat.emissiveColor = { 0,0,0 }; redWallMat.reflectiveness = 0.0f; redWallMat.isTransparent = false;
 	ConstMaterial backWallMat; backWallMat.albedo = { 0.8,0,0 }; backWallMat.emissiveColor = { 0,0,0 }; backWallMat.reflectiveness = 0.0f; backWallMat.isTransparent = false;
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 5.0f;
+	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 30.0f;
 	ConstMaterial glowCubeMat; glowCubeMat.albedo = { 0,1,0 }; glowCubeMat.emissiveColor = { 0,1,0 };
 
 

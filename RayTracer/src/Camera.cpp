@@ -12,16 +12,28 @@ namespace RayTracer
 {
 	Camera::Camera(unsigned int width, unsigned int height, float fov, glm::vec3 position, glm::vec3 lookAt, float lensRadius, glm::vec3 upVector) : m_width(width), m_height(height), m_fov(fov), m_position(position), m_lensRadius(lensRadius)
 	{
+		// Create the hdr buffer
+		m_hdrBuffer = new glm::vec3*[height];
+		for (int i = 0; i < height; i++)
+		{
+			m_hdrBuffer[i] = new glm::vec3[width];
+		}
+
 		m_renderTarget.assign(m_width, m_height, 1, 3);
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 16;
+		m_raysPerPixel = 256;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
 	}
 	
+	void Camera::AddPostProcess(PostProcess* process)
+	{
+		m_postProcesses.push_back(process);
+	}
+
     // Cast the camera rays into the scene. Code set up from scratchapixel.com with modifications to support camera transforms
 	void Camera::Render(Scene* scene)
 	{
@@ -50,6 +62,25 @@ namespace RayTracer
 		for (int t = 0; t < m_numberOfThreads - 1; t++)
 		{
 			threads[t].join();
+		}
+
+		// Apply post processes to hdrBuffer
+		for (int i = 0; i < m_postProcesses.size(); i++)
+		{
+			m_hdrBuffer = m_postProcesses[i]->Apply(m_hdrBuffer, m_width, m_height);
+		}
+
+		// Place final result in the cimg render target
+		for (int y = 0; y < m_height; y++)
+		{
+			for (int x = 0; x < m_width; x++)
+			{
+				glm::vec3 color = m_hdrBuffer[y][x];
+
+				m_renderTarget(x, y, 0, 0) = (unsigned char)(color.r * 255);
+				m_renderTarget(x, y, 0, 1) = (unsigned char)(color.g * 255);
+				m_renderTarget(x, y, 0, 2) = (unsigned char)(color.b * 255);
+			}
 		}
 	}
 	
@@ -116,16 +147,10 @@ namespace RayTracer
 
 			color = color / float(m_raysPerPixel);
 
-			// Clamp returned value just to be safe
-			glm::vec3 clampedColor = color;//glm::clamp(color, { 0,0,0 }, { 1,1,1 });
-
-
 			m_renderMutex.lock();
 
-			// Store in the cimg object
-			m_renderTarget(x, y, 0, 0) = (unsigned char)(clampedColor.r * 255);
-			m_renderTarget(x, y, 0, 1) = (unsigned char)(clampedColor.g * 255);
-			m_renderTarget(x, y, 0, 2) = (unsigned char)(clampedColor.b * 255);
+			// Store color in the hdr buffer
+			m_hdrBuffer[y][x] = color;
 
 			m_renderMutex.unlock();
 		}
