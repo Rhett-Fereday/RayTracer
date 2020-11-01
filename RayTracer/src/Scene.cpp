@@ -45,57 +45,70 @@ namespace RayTracer
 		bool intersectsObject = TestIntersection(rayOrigin, ray, hitInformation);
 
 		// No intersection - return default value
-		if (!intersectsObject) return intensity;
+		if (!intersectsObject) return intensity;		
 
-		// We hit a luminaire
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			// Calculate the incidence between the ray and the emissive surface normal. Attenuate by distance squared
-			
-			float lightIntensity = hitInformation.hitMaterial->emissiveStrength;
+			float incidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
+			float attenuation = 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
 
-			if (depth > 1)
-			{
-				float incidence = glm::dot(hitInformation.hitNormal, -ray);
-				lightIntensity = (incidence * hitInformation.hitMaterial->emissiveStrength) / (hitInformation.hitDistance * hitInformation.hitDistance);
-			}
-
-			return lightIntensity * hitInformation.hitMaterial->albedo;
+			return incidence * attenuation * hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
 		}
 
-		// Calculate orthonormal basis from the hitNormal
-		glm::vec3 w = hitInformation.hitNormal;
+		glm::vec3 indirectComponent = { 0,0,0 };
+		glm::vec3 directComponent = { 0,0,0 };
 
-		//glm::vec3 planePoint = { 1,1, (glm::dot(w, hitInformation.hitPosition) - w.x - w.y) / w.z };
-
-		//glm::vec3 u = planePoint - hitInformation.hitPosition;
-
-		glm::vec3 u = { w.z - w.y, w.x - w.z, w.y - w.x };
-
-		glm::vec3 v = glm::cross(w, u);
-
-		// Generate two random floats in range [0,1]
-		float rand1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		float rand2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-		// Calculate the x, y, and z components of a new random ray assuming a lambertian BRDF
-		float a = glm::cos(2.0f * 3.14f * rand1) * sqrt(rand2);
-		float b = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
-		float c = sqrt(1.0f - rand2);
-
-		glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
-
-		float lightIntensity = 1.0f;
-
-		/*if (depth > 1)
+		// Calculate the indirect component
 		{
-			float incidence = glm::dot(hitInformation.hitNormal, -ray);
-			lightIntensity = incidence / (hitInformation.hitDistance * hitInformation.hitDistance);
+			// Calculate orthonormal basis from the hitNormal
+			glm::vec3 w = hitInformation.hitNormal;
+			glm::vec3 u = { w.z - w.y, w.x - w.z, w.y - w.x };
+			glm::vec3 v = glm::cross(w, u);
+
+			// Generate two random floats in range [0,1]
+			float rand1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float rand2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+			// Calculate the x, y, and z components of a new random ray assuming a lambertian BRDF
+			float a = glm::cos(2.0f * 3.14f * rand1) * sqrt(rand2);
+			float b = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
+			float c = sqrt(1.0f - rand2);
+
+			glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
+
+			float indirectIncidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, newRay));
+
+			indirectComponent = 2.0f * 3.14f * indirectIncidence * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
+		}
+
+		/*for (int i = 0; i < m_lights.size(); i++)
+		{
+			glm::vec3 shadowRay;
+			float pdf;
+			float sampleDistance;
+
+			glm::vec3 radiance = m_lights[i]->SampleRadiance(hitInformation.hitPosition, hitInformation.hitNormal, shadowRay, pdf, sampleDistance);
+
+			if (radiance == glm::vec3(0)) continue;
+
+			HitInfo occlusionInfo;
+			bool occluded = TestIntersection(hitInformation.hitPosition + 0.0001f * shadowRay, shadowRay, occlusionInfo, false);
+
+			if (occluded && (occlusionInfo.hitDistance < sampleDistance)) continue;
+
+			directLighting += (radiance / pdf);
 		}*/
 
-		glm::vec3 lighting = lightIntensity * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
 
-		return lighting * hitInformation.hitMaterial->albedo;
+		// How much light actually travels back along the incident ray
+		float incidence = std::max(0.0f, glm::dot(-ray, hitInformation.hitNormal));
+
+		// Attenuate for distance... or not?
+		float attenuation = 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
+
+		glm::vec3 totalLighting = directComponent + indirectComponent;
+
+		return incidence * totalLighting * hitInformation.hitMaterial->albedo / 3.14f;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.

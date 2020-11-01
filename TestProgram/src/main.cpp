@@ -30,35 +30,17 @@ int main(int argc, char* argv[])
 	
 
 	// Create the materials to be used in the scene
-	ConstMaterial teapotMat1; teapotMat1.albedo = { 0.972, 0.960, 0.915 }; teapotMat1.emissiveColor = { 0,0,0 }; teapotMat1.reflectiveness = 0.0f; teapotMat1.isTransparent = true; teapotMat1.refractiveIndex = 1.5f; teapotMat1.reflectionLobeAngle = 0.0f; teapotMat1.transmissionLobeAngle = 3.0f;
-	ConstMaterial teapotMat2; teapotMat2.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f }; teapotMat2.emissiveColor = { 0,0,0 }; teapotMat2.reflectiveness = 0.1f; teapotMat2.isTransparent = false;
-	ConstMaterial teapotMat3; teapotMat3.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f }; teapotMat3.emissiveColor = { 0,0,0 }; teapotMat3.reflectiveness = 0.1f; teapotMat3.isTransparent = false;
-	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f,125.0f / 255.0f,70.0f / 255.0f }; greenWallMat.emissiveColor = { 0.0f,0.0f,0.0f }; greenWallMat.reflectiveness = 0.0f; greenWallMat.isTransparent = false;
-	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 }; whiteMat.emissiveColor = { 0.0f,0.0f,0.0f }; whiteMat.reflectiveness = 0.0f; whiteMat.isTransparent = false;
-	ConstMaterial redWallMat; redWallMat.albedo = { 0.545,0,0 }; redWallMat.emissiveColor = { 0,0,0 }; redWallMat.reflectiveness = 0.0f; redWallMat.isTransparent = false;
-	ConstMaterial backWallMat; backWallMat.albedo = { 0.8,0,0 }; backWallMat.emissiveColor = { 0,0,0 }; backWallMat.reflectiveness = 0.0f; backWallMat.isTransparent = false;
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 30.0f;
-	ConstMaterial glowCubeMat; glowCubeMat.albedo = { 0,1,0 }; glowCubeMat.emissiveColor = { 0,1,0 };
+	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
+	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
+	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
+	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 200.0f;
 
-
-	// Add area lights
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.48, 0 });
-	BoxLight boxLight1 = BoxLight(transform, { 0.25,0.01,0.25 }, &areaLightMat, { 1,1,1 }, 1.0f);
-	//scene.AddLight(&boxLight1);
-
-	transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
 	scene.AddObject(&fakeLight1);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0.4, 1.5, 0 });
-	Box fakeLight2 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	scene.AddObject(&fakeLight2);
-
-	PointLight pointLight = PointLight({ 1,1,1 }, 10, { 0, 0.75, 0 });
+	PointLight pointLight = PointLight({ 1,1,1 }, 5, { 0, 1.49, 0 });
 	//scene.AddLight(&pointLight);
-
-	//DirectionalLight sunLight = DirectionalLight({ 0,-1,-1 }, { 1,1,1 }, 2.0f);
-	//scene.AddLight(&sunLight);
 
 	// Load the meshes for the scene
 	//Mesh teapotMesh = Mesh("teapot.obj", 11);
@@ -66,41 +48,7 @@ int main(int argc, char* argv[])
 	//Mesh teacupMesh = Mesh("teacup.obj", 14);
 	//Mesh amphoraMesh = Mesh("amphora.obj", 10);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -3 });
-	//transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
-	//transform = glm::rotate(transform, glm::radians(-35.0f), { 0,0,1 });
-	transform = glm::scale(transform, { 0.05, 0.05, 0.05 });
-	//MeshInstance teacupInstance = MeshInstance(&teacupMesh, transform, &teapotMat1);
-	//scene.AddObject(&teacupInstance);
-
-	transform = glm::translate(glm::mat4(1.0f), { 0.1, 0.05, -3 });
-	//transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
-	//transform = glm::rotate(transform, glm::radians(-35.0f), { 0,0,1 });
-	transform = glm::scale(transform, { 0.2, 0.2, 0.2 });
-	//MeshInstance bunnyInstance = MeshInstance(&bunnyMesh, transform, &teapotMat1);
-	//scene.AddObject(&bunnyInstance);
-
-	transform = glm::translate(glm::mat4(1.0f), { 0.75, 0, -3.75 });
-	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
-	transform = glm::rotate(transform, glm::radians(-25.0f), { 0,0,1 });
-	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	//MeshInstance teapotInstance2 = MeshInstance(&teapotMesh, transform, &teapotMat2);
-	//scene.AddObject(&teapotInstance2);
-
-	transform = glm::translate(glm::mat4(1.0f), { 0, 0, -3.75 });
-	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
-	transform = glm::rotate(transform, glm::radians(-155.0f), { 0,0,1 });
-	transform = glm::scale(transform, { 0.025, 0.025, 0.025 });
-	//MeshInstance teapotInstance3 = MeshInstance(&teapotMesh, transform, &teapotMat3);
-	//scene.AddObject(&teapotInstance3);
-
-	// Add a test sphere
-	transform = glm::translate(glm::mat4(1.0f), { 0,0.5,-10 });
-	//transform = glm::scale(transform, { 0.25, 0.25, 0.25 });
-	Sphere sphere = Sphere(transform, &teapotMat1);
-	//scene.AddObject(&sphere);
-
-	// Add the floor and ceiling
+	// Construct the Cornell Box
 	transform = glm::translate(glm::mat4(1.0f), { 0,-0.025,0 });
 	Box floor = Box(transform, &whiteMat, { 2,0.05,2 });
 	scene.AddObject(&floor);

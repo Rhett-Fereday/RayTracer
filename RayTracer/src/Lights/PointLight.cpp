@@ -9,30 +9,21 @@ namespace RayTracer
 	}
 
 	// Point light illumination is also very easy. Spherical attenuation from scratchapixel.com
-	glm::vec3 PointLight::Illumination(const glm::vec3 & point, const glm::vec3 & normal, const glm::vec3 & ray)
+	glm::vec3 PointLight::SampleRadiance(const glm::vec3& point, const glm::vec3& normal, glm::vec3 &sampleDirection, float &pdf, float &sampleDistance)
 	{
-		glm::vec3 returnIntensity = { 0,0,0 };
+		glm::vec3 returnRadiance = { 0,0,0 };
 
-		float incidence = std::max(0.0f, glm::dot(normal, DirectionToLight(point)));
+		sampleDirection = glm::normalize(m_position - point);
+		pdf = 1.0f;
 
-		if (incidence > 0.0f)
-		{
-			float r = glm::distance(m_position, point);
-			float lightReceived = m_intensity / (4.0f * 3.14f * (r * r));
-			returnIntensity = m_color * lightReceived * incidence;
-		}
+		float incidence = std::max(0.0f, glm::dot(normal, sampleDirection));
 
-		return returnIntensity;
-	}
+		if (incidence == 0.0f) return returnRadiance;
 
-	glm::vec3 PointLight::DirectionToLight(const glm::vec3 & point)
-	{
-		return glm::normalize(m_position - point);
-	}
+		sampleDistance = glm::distance(m_position, point);
+		float lightReceived = m_intensity / (4.0f * 3.14f * (sampleDistance * sampleDistance));
+		returnRadiance = m_color * lightReceived * incidence;
 
-	float PointLight::DistanceToLight(const glm::vec3 & point)
-	{
-		float dist = glm::distance(m_position, point);
-		return dist;
+		return returnRadiance;
 	}
 }

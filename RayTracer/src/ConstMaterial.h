@@ -9,7 +9,6 @@ namespace RayTracer
 	struct RT_API ConstMaterial
 	{
 		glm::vec3 albedo = { 1,1,1 };
-		glm::vec3 emissiveColor = { 0,0,0 };
 		float emissiveStrength = 0.0f;
 		float reflectiveness = 0.0f;
 		bool isTransparent = false;

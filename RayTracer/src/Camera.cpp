@@ -23,7 +23,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 256;
+		m_raysPerPixel = 64;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
@@ -141,6 +141,10 @@ namespace RayTracer
 				temp = m_cameraToWorld * glm::vec4(originOnLens, 1);
 				originOnLens = { temp.x, temp.y, temp.z };
 
+				if ((x == 30) && (y == 210))
+				{
+					int test = 0;
+				}
 				// Cast the ray using the Scene class' recursive TraceRay method
 				color += scene->TraceRay(originOnLens, focusedRay, glm::vec3(1.0f), 1);
 			}

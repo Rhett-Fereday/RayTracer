@@ -10,27 +10,20 @@ namespace RayTracer
 	}
 
 	// Directional lighting is very straightforward
-	glm::vec3 DirectionalLight::Illumination(const glm::vec3& point, const glm::vec3& normal, const glm::vec3& ray)
+	glm::vec3 DirectionalLight::SampleRadiance(const glm::vec3& point, const glm::vec3& normal, glm::vec3 &sampleDirection, float &pdf, float &sampleDistance)
 	{
-		glm::vec3 returnIntensity = { 0,0,0 };
-
+		glm::vec3 returnRadiance = { 0,0,0 };
+		
 		float incidence = std::max(0.0f, glm::dot(normal, -m_direction));
 
-		if (incidence > 0.0f)
-		{
-			returnIntensity = m_color * incidence * m_intensity;
-		}
+		if (incidence == 0.0f) return returnRadiance;
 
-		return returnIntensity;
-	}
+		returnRadiance = m_color * m_intensity * incidence;
 
-	glm::vec3 DirectionalLight::DirectionToLight(const glm::vec3& point)
-	{
-		return glm::normalize(-m_direction);
-	}
+		sampleDirection = -m_direction;
+		pdf = 1.0f;
+		sampleDistance = INFINITY;
 
-	float DirectionalLight::DistanceToLight(const glm::vec3 & point)
-	{
-		return 1000000.0f;
+		return returnRadiance;
 	}
 }

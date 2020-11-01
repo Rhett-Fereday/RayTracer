@@ -16,36 +16,32 @@ namespace RayTracer
 		}*/
 
 		float maxLuminance = 0.0f;
-		float avgLuminance = 0.0f;
 
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
 				glm::vec3 color = inputImage[y][x];
+
 				float luminance = glm::dot(color, { 0.2126f, 0.7152f, 0.0722f });
-				avgLuminance += luminance;
 
 				if (luminance > maxLuminance) maxLuminance = luminance;
 			}
 		}
 
-		avgLuminance = avgLuminance / float(width * height);
-
+		//maxLuminance = glm::dot(glm::vec3(maxChannel), { 0.2126f, 0.7152f, 0.0722f });
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				/*glm::vec3 color = inputImage[y][x];
-				float luminance = glm::dot(color, { 0.2126f, 0.7152f, 0.0722f });
-				float numerator = luminance * (1.0f + (luminance / (maxLuminance * maxLuminance)));
-				float newLuminance = numerator / (1.0f + luminance);*/
 				glm::vec3 color = inputImage[y][x];
 				float luminance = glm::dot(color, { 0.2126f, 0.7152f, 0.0722f });
 				float numerator = luminance * (1.0f + (luminance / (maxLuminance * maxLuminance)));
 				float newLuminance = numerator / (1.0f + luminance);
 
-				outputImage[y][x] = color * (newLuminance / luminance);
+				color = color * (newLuminance / luminance);
+
+				outputImage[y][x] = glm::clamp(color, { 0,0,0 }, { 1,1,1 });
 			}
 		}
 

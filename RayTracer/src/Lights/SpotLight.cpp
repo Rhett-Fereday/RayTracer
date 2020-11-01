@@ -12,33 +12,28 @@ namespace RayTracer
 	}
 
 	// This code was modeled after spotlights on learnopengl.com for the sake of having a "soft" edge
-	glm::vec3 SpotLight::Illumination(const glm::vec3 & point, const glm::vec3 & normal, const glm::vec3 & ray)
+	glm::vec3 SpotLight::SampleRadiance(const glm::vec3& point, const glm::vec3& normal, glm::vec3 &sampleDirection, float &pdf, float &sampleDistance)
 	{
-		glm::vec3 returnIntensity = { 0,0,0 };
+		glm::vec3 returnRadiance = { 0,0,0 };
 
-		float theta = glm::dot(DirectionToLight(point), -m_direction);
+		sampleDirection = glm::normalize(m_position - point);
+		pdf = 1.0f;
 
-		if (theta < m_outerAngle) return returnIntensity;
+		float theta = glm::dot(sampleDirection, -m_direction);
 
-		float incidence = std::max(0.0f, glm::dot(normal, DirectionToLight(point)));
-		if (incidence == 0.0f) return returnIntensity;
+		if (theta < m_outerAngle) return returnRadiance;
+
+		float incidence = std::max(0.0f, glm::dot(normal, sampleDirection));
+
+		if (incidence == 0.0f) return returnRadiance;
 
 		float epsilon = (m_innerAngle - m_outerAngle);
 		float intensity = glm::clamp((theta - m_outerAngle) / epsilon, 0.0f, 1.0f);
-		float distance = glm::distance(m_position, point);
-		float lightReceived = m_intensity / (distance * distance);
-		returnIntensity = m_color * lightReceived * intensity * incidence;
+		sampleDistance = glm::distance(m_position, point);
+		float lightReceived = m_intensity / (sampleDistance * sampleDistance);
 
-		return returnIntensity;
-	}
+		returnRadiance = m_color * lightReceived * intensity * incidence;
 
-	glm::vec3 SpotLight::DirectionToLight(const glm::vec3 & point)
-	{
-		return glm::normalize(m_position - point);
-	}
-
-	float SpotLight::DistanceToLight(const glm::vec3 & point)
-	{
-		return glm::distance(m_position, point);
+		return returnRadiance;
 	}
 }
