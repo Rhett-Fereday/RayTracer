@@ -81,7 +81,7 @@ namespace RayTracer
 			indirectComponent = 2.0f * 3.14f * indirectIncidence * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
 		}
 
-		/*for (int i = 0; i < m_lights.size(); i++)
+		for (int i = 0; i < m_lights.size(); i++)
 		{
 			glm::vec3 shadowRay;
 			float pdf;
@@ -96,8 +96,8 @@ namespace RayTracer
 
 			if (occluded && (occlusionInfo.hitDistance < sampleDistance)) continue;
 
-			directLighting += (radiance / pdf);
-		}*/
+			directComponent += (radiance / pdf);
+		}
 
 
 		// How much light actually travels back along the incident ray
