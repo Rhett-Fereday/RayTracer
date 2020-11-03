@@ -50,7 +50,7 @@ namespace RayTracer
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
 			float incidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
-			float attenuation = 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
+			float attenuation = 1.0f;// 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
 
 			return incidence * attenuation * hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
 		}
@@ -76,39 +76,21 @@ namespace RayTracer
 
 			glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
 
-			float indirectIncidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, newRay));
-
-			indirectComponent = 2.0f * 3.14f * indirectIncidence * TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
-		}
-
-		for (int i = 0; i < m_lights.size(); i++)
-		{
-			glm::vec3 shadowRay;
-			float pdf;
-			float sampleDistance;
-
-			glm::vec3 radiance = m_lights[i]->SampleRadiance(hitInformation.hitPosition, hitInformation.hitNormal, shadowRay, pdf, sampleDistance);
-
-			if (radiance == glm::vec3(0)) continue;
-
-			HitInfo occlusionInfo;
-			bool occluded = TestIntersection(hitInformation.hitPosition + 0.0001f * shadowRay, shadowRay, occlusionInfo, false);
-
-			if (occluded && (occlusionInfo.hitDistance < sampleDistance)) continue;
-
-			directComponent += (radiance / pdf);
+			indirectComponent = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
 		}
 
 
 		// How much light actually travels back along the incident ray
-		float incidence = std::max(0.0f, glm::dot(-ray, hitInformation.hitNormal));
+		float cos_theta_prime = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
 
 		// Attenuate for distance... or not?
 		float attenuation = 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
+		float BRDF = 1.0f / 3.14f; // For perfect lambertian
+		float pdf = 1.0f / 2.0f * 3.14f; // Uniform hemispherical sampling
 
 		glm::vec3 totalLighting = directComponent + indirectComponent;
 
-		return incidence * totalLighting * hitInformation.hitMaterial->albedo / 3.14f;
+		return totalLighting * hitInformation.hitMaterial->albedo;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.

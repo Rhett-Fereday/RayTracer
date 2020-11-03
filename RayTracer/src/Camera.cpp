@@ -23,7 +23,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 16;
+		m_raysPerPixel = 128;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
@@ -77,9 +77,13 @@ namespace RayTracer
 			{
 				glm::vec3 color = m_hdrBuffer[y][x];
 
-				m_renderTarget(x, y, 0, 0) = (unsigned char)(color.r * 255);
-				m_renderTarget(x, y, 0, 1) = (unsigned char)(color.g * 255);
-				m_renderTarget(x, y, 0, 2) = (unsigned char)(color.b * 255);
+				unsigned char r = glm::clamp((unsigned char)(color.r * 255), (unsigned char)0, (unsigned char)255);
+				unsigned char g = glm::clamp((unsigned char)(color.g * 255), (unsigned char)0, (unsigned char)255);
+				unsigned char b = glm::clamp((unsigned char)(color.b * 255), (unsigned char)0, (unsigned char)255);
+
+				m_renderTarget(x, y, 0, 0) = r;
+				m_renderTarget(x, y, 0, 1) = g;
+				m_renderTarget(x, y, 0, 2) = b;
 			}
 		}
 	}

@@ -33,14 +33,18 @@ int main(int argc, char* argv[])
 	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 100.0f;
+	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 10.0f;
 
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.5, 0 });
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	//scene.AddObject(&fakeLight1);
+	scene.AddObject(&fakeLight1);
+
+	transform = glm::translate(glm::mat4(1.0f), { 0.4, 1.5, 0 });
+	Box fakeLight2 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
+	scene.AddObject(&fakeLight2);
 
 	PointLight pointLight = PointLight({ 1,1,1 }, 5, { 0, 1.49, 0 });
-	scene.AddLight(&pointLight);
+	//scene.AddLight(&pointLight);
 
 	// Load the meshes for the scene
 	//Mesh teapotMesh = Mesh("teapot.obj", 11);
