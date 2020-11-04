@@ -20,9 +20,6 @@
     <ClInclude Include="src\Lights\AreaLight.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\BoxLight.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
     <ClInclude Include="src\Lights\DirectionalLight.h">
       <Filter>Lights</Filter>
     </ClInclude>
@@ -61,14 +58,14 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Lights\RectLight.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BVH.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Lights\AreaLight.cpp">
-      <Filter>Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Lights\BoxLight.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="src\Lights\DirectionalLight.cpp">
@@ -106,5 +103,8 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Lights\RectLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

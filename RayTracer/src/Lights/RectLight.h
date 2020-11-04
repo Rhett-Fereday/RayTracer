@@ -9,11 +9,14 @@ namespace RayTracer
 	class RT_API RectLight : public AreaLight
 	{
 	public:
-		RectLight(glm::mat4 transform, glm::vec3 dimensions, ConstMaterial* material, glm::vec3 color, float intensity);
+		RectLight(glm::mat4 transform, float width, float length, ConstMaterial* material);
 		glm::vec3 SampleRadiance(const glm::vec3& point, const glm::vec3& normal, glm::vec3 &sampleDirection, float &pdf, float &sampleDistance);
 
+	protected:
+		virtual bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, HitInfo& hitInfo);
+
 	private:
-		RTMath::AABB m_aabb;
-		glm::vec3 m_dimensions;
+		float m_length, m_width;
+		glm::vec3 m_xAxis, m_yAxis, m_normal, m_center;
 	};
 }

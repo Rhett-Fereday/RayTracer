@@ -8,6 +8,37 @@ namespace RayTracer
 	{
 		using namespace glm;
 
+		//Determine whether or not a ray intersects a plane
+		//This method assumes the rayOrigin and rayDirection are in model space. 
+		//It also assumes the "face" of the plane faces the positive z direction in model space
+		bool RayPlaneIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const float width, const float length, float &hitDistance)
+		{
+			glm::vec3 planeNormal = { 0,0,1 };
+
+			// assuming vectors are all normalized
+			float denom = dot(planeNormal, -rayDirection);
+
+			if (denom > 1e-6) 
+			{
+				//glm::vec3 p0l0 = -rayOrigin;
+				hitDistance = dot(rayOrigin, planeNormal) / denom;
+
+				glm::vec3 hitPoint = rayOrigin + hitDistance * rayDirection;
+				float distanceFromCenter = distance(hitPoint, { 0,0,0 });
+
+				if (hitDistance >= 0)
+				{
+					float x = fabs(hitPoint.x);
+					float y = fabs(hitPoint.y);
+
+					if ((x > width / 2.0f) || (y > length / 2.0f)) return false;
+
+					return true;
+				}
+			}
+
+			return false;
+		}
 		
 		//Determine whether or not a ray intersects a sphere of a given radius.
 		//This method assumes the rayOrigin and rayDirection are in model space.

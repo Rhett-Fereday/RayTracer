@@ -10,7 +10,7 @@
 #include "Lights/DirectionalLight.h"
 #include "Lights/PointLight.h"
 #include "Lights/SpotLight.h"
-#include "Lights/BoxLight.h"
+#include "Lights/RectLight.h"
 #include "PostProcesses/NaiveReinhard.h"
 #include <time.h>
 #include <iostream>
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.75,2 }, { 0,0.75,0 }, 0.0001);
+	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
 
 	NaiveReinhard toneMapper = NaiveReinhard();
 	camera.AddPostProcess(&toneMapper);
@@ -33,18 +33,25 @@ int main(int argc, char* argv[])
 	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 10.0f;
+	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 25.0f;
+	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 25.0f;
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	scene.AddObject(&fakeLight1);
+	//scene.AddObject(&fakeLight1);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.4, 1.5, 0 });
 	Box fakeLight2 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	scene.AddObject(&fakeLight2);
+	//scene.AddObject(&fakeLight2);
 
-	PointLight pointLight = PointLight({ 1,1,1 }, 5, { 0, 1.49, 0 });
+	PointLight pointLight = PointLight({ 1,1,1 }, 10, { 0, 1.49, 0 });
 	//scene.AddLight(&pointLight);
+
+	transform = glm::translate(glm::mat4(1.0f), { 0, 1.299, 0 });
+	transform = glm::rotate(transform, glm::radians(90.0f), { 1,0,0 });
+	RectLight rectLight = RectLight(transform, 0.25f, 0.25f, &yellowAreaLightMat);
+	scene.AddObject(&rectLight);
+	scene.AddLight(&rectLight);
 
 	// Load the meshes for the scene
 	//Mesh teapotMesh = Mesh("teapot.obj", 11);
@@ -57,30 +64,30 @@ int main(int argc, char* argv[])
 	Box floor = Box(transform, &whiteMat, { 2,0.05,2 });
 	scene.AddObject(&floor);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0, 1.525, 0 });
+	transform = glm::translate(glm::mat4(1.0f), { 0, 1.325, 0 });
 	Box ceiling = Box(transform, &whiteMat, { 2, 0.05, 2 });
 	scene.AddObject(&ceiling);
 
-	transform = glm::translate(glm::mat4(1.0f), { -1.025,1,0 });
+	transform = glm::translate(glm::mat4(1.0f), { -0.75025,1,0 });
 	Box leftWall = Box(transform, &redWallMat, { 0.05, 2, 2 });
 	scene.AddObject(&leftWall);
 
-	transform = glm::translate(glm::mat4(1.0f), { 1.025,1,0 });
+	transform = glm::translate(glm::mat4(1.0f), { 0.75025,1,0 });
 	Box rightWall = Box(transform, &greenWallMat, { 0.05,2,2 });
 	scene.AddObject(&rightWall);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0,1,-1.025 });
+	transform = glm::translate(glm::mat4(1.0f), { 0,1,-0.75025 });
 	Box backWall = Box(transform, &whiteMat, { 2,2,0.05 });
 	scene.AddObject(&backWall);
 
-	transform = glm::translate(glm::mat4(1.0f), { -0.45, 0.5, -0.3 });
-	transform = glm::rotate(transform, glm::radians(30.0f), { 0,1,0 });
-	Box leftBox = Box(transform, &whiteMat, { 0.4, 1, 0.4 });
+	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.4, -0.3 });
+	transform = glm::rotate(transform, glm::radians(20.0f), { 0,1,0 });
+	Box leftBox = Box(transform, &whiteMat, { 0.4, 0.8, 0.4 });
 	scene.AddObject(&leftBox);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0.5, 0.25, -0.25 });
-	transform = glm::rotate(transform, glm::radians(25.0f), { 0,1,0 });
-	Box rightBox = Box(transform, &whiteMat, { 0.3, 0.5, 0.3 });
+	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0 });
+	transform = glm::rotate(transform, glm::radians(-20.0f), { 0,1,0 });
+	Box rightBox = Box(transform, &whiteMat, { 0.4, 0.4, 0.4 });
 	scene.AddObject(&rightBox);
 
 

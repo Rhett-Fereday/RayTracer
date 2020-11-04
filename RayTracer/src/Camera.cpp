@@ -23,7 +23,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 128;
+		m_raysPerPixel = 32;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
@@ -81,9 +81,22 @@ namespace RayTracer
 				unsigned char g = glm::clamp((unsigned char)(color.g * 255), (unsigned char)0, (unsigned char)255);
 				unsigned char b = glm::clamp((unsigned char)(color.b * 255), (unsigned char)0, (unsigned char)255);
 
-				m_renderTarget(x, y, 0, 0) = r;
-				m_renderTarget(x, y, 0, 1) = g;
-				m_renderTarget(x, y, 0, 2) = b;
+				int R = color.r * 255;
+				int G = color.g * 255;
+				int B = color.b * 255;
+
+				if (R > 255) R = 255;
+				if (R < 0) R = 0;
+
+				if (G > 255) G = 255;
+				if (G < 0) G = 0;
+
+				if (B > 255) B = 255;
+				if (B < 0) B = 0;
+
+				m_renderTarget(x, y, 0, 0) = (unsigned char)R;
+				m_renderTarget(x, y, 0, 1) = (unsigned char)G;
+				m_renderTarget(x, y, 0, 2) = (unsigned char)B;
 			}
 		}
 	}
@@ -145,10 +158,7 @@ namespace RayTracer
 				temp = m_cameraToWorld * glm::vec4(originOnLens, 1);
 				originOnLens = { temp.x, temp.y, temp.z };
 
-				if ((x == 30) && (y == 210))
-				{
-					int test = 0;
-				}
+
 				// Cast the ray using the Scene class' recursive TraceRay method
 				color += scene->TraceRay(originOnLens, focusedRay, glm::vec3(1.0f), 1);
 			}

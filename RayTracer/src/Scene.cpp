@@ -8,7 +8,7 @@ namespace RayTracer
 		m_camera = camera;
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
-		m_recursionLimit = 16;
+		m_recursionLimit = 4;
 	}
 
 	void Scene::AddObject(Object* object)
@@ -40,25 +40,58 @@ namespace RayTracer
 		if (depth > m_recursionLimit) return intensity;
 
 		HitInfo hitInformation;
+		bool intersectsObject;
 
-		// Test whether this ray intersects an object within the scene
-		bool intersectsObject = TestIntersection(rayOrigin, ray, hitInformation);
+		if (depth > 1)
+		{
+			// Test whether this ray intersects an object within the scene
+			intersectsObject = TestIntersection(rayOrigin, ray, hitInformation);
+		}
+		else
+		{
+			intersectsObject = TestIntersection(rayOrigin, ray, hitInformation, true, true);
+		}
 
 		// No intersection - return default value
 		if (!intersectsObject) return intensity;		
 
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			float incidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
-			float attenuation = 1.0f;// 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
+			if (depth > 1) return intensity;
+			else
+			{
+				float incidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
 
-			return incidence * attenuation * hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
+				return hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
+			}
 		}
 
 		glm::vec3 indirectComponent = { 0,0,0 };
 		glm::vec3 directComponent = { 0,0,0 };
 
-		// Calculate the indirect component
+		// Calculate direct component
+		for (int i = 0; i < m_lights.size(); i++)
+		{
+			glm::vec3 occlusionRay;
+			float pdf;
+			float sampleDistance;
+			glm::vec3 irradiance = m_lights[i]->SampleRadiance(hitInformation.hitPosition, hitInformation.hitNormal, occlusionRay, pdf, sampleDistance);
+			
+			HitInfo occlusionInfo;
+			bool occluded = TestIntersection(hitInformation.hitPosition + 0.0001f * occlusionRay, occlusionRay, occlusionInfo, false);
+			
+			if (occluded)
+			{
+				if (occlusionInfo.hitDistance < sampleDistance)
+				{
+					continue;
+				}
+			}
+
+			directComponent += irradiance / pdf;
+		}
+
+		//Calculate the indirect component
 		{
 			// Calculate orthonormal basis from the hitNormal
 			glm::vec3 w = hitInformation.hitNormal;
@@ -74,27 +107,19 @@ namespace RayTracer
 			float b = glm::sin(2.0f * 3.14f * rand1) * sqrt(rand2);
 			float c = sqrt(1.0f - rand2);
 
-			glm::vec3 newRay = glm::normalize(a * u + b * v + c * w);
-
-			indirectComponent = TraceRay(hitInformation.hitPosition + 0.001f * newRay, newRay, { 1,1,1 }, depth + 1);
+			glm::vec3 indirectSample = glm::normalize(a * u + b * v + c * w);
+			float cos_theta = std::max(0.0f, glm::dot(hitInformation.hitNormal, indirectSample));
+			indirectComponent = TraceRay(hitInformation.hitPosition + 0.001f * indirectSample, indirectSample, { 1,1,1 }, depth + 1);
 		}
 
-
-		// How much light actually travels back along the incident ray
-		float cos_theta_prime = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
-
-		// Attenuate for distance... or not?
-		float attenuation = 1.0f / (hitInformation.hitDistance * hitInformation.hitDistance);
-		float BRDF = 1.0f / 3.14f; // For perfect lambertian
-		float pdf = 1.0f / 2.0f * 3.14f; // Uniform hemispherical sampling
-
+		float cos_theta_prime = std::max(0.0f, glm::dot(hitInformation.hitNormal, glm::normalize(-ray)));
 		glm::vec3 totalLighting = directComponent + indirectComponent;
 
 		return totalLighting * hitInformation.hitMaterial->albedo;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.
-	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation, bool includeTransparentObjects)
+	bool Scene::TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation, bool includeTransparentObjects, bool includeEmissiveObjects)
 	{
 		Object* hitObject = nullptr;
 		float closest = INFINITY;
@@ -106,6 +131,7 @@ namespace RayTracer
 			if (m_objects[i]->Intersects(rayOrigin, ray, tempInfo))
 			{
 				if (tempInfo.hitMaterial->isTransparent && !includeTransparentObjects) continue;
+				if ((tempInfo.hitMaterial->emissiveStrength > 0) && !includeEmissiveObjects) continue;
 
 				if (tempInfo.hitDistance < closest)
 				{
