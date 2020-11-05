@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
+	Camera camera = RayTracer::Camera(1920, 1080, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
 
 	NaiveReinhard toneMapper = NaiveReinhard();
 	camera.AddPostProcess(&toneMapper);
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
 	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 25.0f;
-	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 25.0f;
+	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 20.0f;
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
 	// Construct the Cornell Box
 	transform = glm::translate(glm::mat4(1.0f), { 0,-0.025,0 });
-	Box floor = Box(transform, &whiteMat, { 2,0.05,2 });
+	Box floor = Box(transform, &whiteMat, { 1.5,0.05,1.5 });
 	scene.AddObject(&floor);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 1.325, 0 });
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 	Box leftBox = Box(transform, &whiteMat, { 0.4, 0.8, 0.4 });
 	scene.AddObject(&leftBox);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0 });
+	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
 	transform = glm::rotate(transform, glm::radians(-20.0f), { 0,1,0 });
 	Box rightBox = Box(transform, &whiteMat, { 0.4, 0.4, 0.4 });
 	scene.AddObject(&rightBox);

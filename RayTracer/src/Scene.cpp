@@ -8,7 +8,7 @@ namespace RayTracer
 		m_camera = camera;
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
-		m_recursionLimit = 4;
+		m_recursionLimit = 16;
 	}
 
 	void Scene::AddObject(Object* object)

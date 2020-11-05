@@ -29,6 +29,9 @@
     <ClInclude Include="src\Lights\PointLight.h">
       <Filter>Lights</Filter>
     </ClInclude>
+    <ClInclude Include="src\Lights\RectLight.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
     <ClInclude Include="src\Lights\SpotLight.h">
       <Filter>Lights</Filter>
     </ClInclude>
@@ -58,9 +61,6 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\Lights\RectLight.h">
-      <Filter>Lights</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BVH.cpp" />
@@ -75,6 +75,9 @@
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="src\Lights\PointLight.cpp">
+      <Filter>Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Lights\RectLight.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="src\Lights\SpotLight.cpp">
@@ -103,8 +106,5 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\Lights\RectLight.cpp">
-      <Filter>Lights</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
