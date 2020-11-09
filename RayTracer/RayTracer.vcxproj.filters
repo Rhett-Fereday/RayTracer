@@ -51,10 +51,19 @@
     <ClInclude Include="src\Objects\Sphere.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\PostProcesses\GammaCorrection.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcesses\ModifiedReinhard.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
     <ClInclude Include="src\PostProcesses\NaiveReinhard.h">
       <Filter>PostProcesses</Filter>
     </ClInclude>
     <ClInclude Include="src\PostProcesses\PostProcess.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostProcesses\PostProcessGroup.h">
       <Filter>PostProcesses</Filter>
     </ClInclude>
     <ClInclude Include="src\RTMath.h" />
@@ -99,7 +108,16 @@
     <ClCompile Include="src\Objects\Sphere.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\PostProcesses\GammaCorrection.cpp">
+      <Filter>PostProcesses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcesses\ModifiedReinhard.cpp">
+      <Filter>PostProcesses</Filter>
+    </ClCompile>
     <ClCompile Include="src\PostProcesses\NaiveReinhard.cpp">
+      <Filter>PostProcesses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcesses\PostProcessGroup.cpp">
       <Filter>PostProcesses</Filter>
     </ClCompile>
     <ClCompile Include="src\RTMath.cpp" />

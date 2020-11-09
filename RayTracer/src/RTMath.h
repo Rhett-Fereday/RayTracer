@@ -25,5 +25,9 @@ namespace RayTracer
 		bool RayTriangleIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const Triangle &triangle, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
 		bool TriangleAABBIntersection(const AABB& aabb, const Triangle &triangle);
 		float Fresnel(const glm::vec3 &incomingDirection, const glm::vec3 &normal, const float &refractiveIndex);
+		float DistributionGGX(const glm::vec3 &normal, const glm::vec3 &halfway, float roughness);
+		float GeometrySchlickGGX(float NdotV, float roughness);
+		float GeometrySmith(const glm::vec3 N, const glm::vec3 V, const glm::vec3 L, float k);
+		glm::vec3 FresnelSchlick(float cosTheta, const glm::vec3 F0);
 	}
 }

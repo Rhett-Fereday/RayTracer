@@ -12,26 +12,27 @@ namespace RayTracer
 {
 	Camera::Camera(unsigned int width, unsigned int height, float fov, glm::vec3 position, glm::vec3 lookAt, float lensRadius, glm::vec3 upVector) : m_width(width), m_height(height), m_fov(fov), m_position(position), m_lensRadius(lensRadius)
 	{
-		// Create the hdr buffer
-		m_hdrBuffer = new glm::vec3*[height];
+		m_rawHDRBuffer = new glm::vec3*[height];
+		m_postProcessBuffer = new glm::vec3*[height];
 		for (int i = 0; i < height; i++)
 		{
-			m_hdrBuffer[i] = new glm::vec3[width];
+			m_rawHDRBuffer[i] = new glm::vec3[width];
+			m_postProcessBuffer[i] = new glm::vec3[width];
 		}
 
 		m_renderTarget.assign(m_width, m_height, 1, 3);
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 1024;
+		m_raysPerPixel = 16;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at
 	}
 	
-	void Camera::AddPostProcess(PostProcess* process)
+	void Camera::AddPostProcessGroup(PostProcessGroup* processGroup)
 	{
-		m_postProcesses.push_back(process);
+		m_postProcessGroups.push_back(processGroup);
 	}
 
     // Cast the camera rays into the scene. Code set up from scratchapixel.com with modifications to support camera transforms
@@ -63,47 +64,59 @@ namespace RayTracer
 		{
 			threads[t].join();
 		}
-
-		// Apply post processes to hdrBuffer
-		for (int i = 0; i < m_postProcesses.size(); i++)
-		{
-			m_hdrBuffer = m_postProcesses[i]->Apply(m_hdrBuffer, m_width, m_height);
-		}
-
-		// Place final result in the cimg render target
-		for (int y = 0; y < m_height; y++)
-		{
-			for (int x = 0; x < m_width; x++)
-			{
-				glm::vec3 color = m_hdrBuffer[y][x];
-
-				unsigned char r = glm::clamp((unsigned char)(color.r * 255), (unsigned char)0, (unsigned char)255);
-				unsigned char g = glm::clamp((unsigned char)(color.g * 255), (unsigned char)0, (unsigned char)255);
-				unsigned char b = glm::clamp((unsigned char)(color.b * 255), (unsigned char)0, (unsigned char)255);
-
-				int R = color.r * 255;
-				int G = color.g * 255;
-				int B = color.b * 255;
-
-				if (R > 255) R = 255;
-				if (R < 0) R = 0;
-
-				if (G > 255) G = 255;
-				if (G < 0) G = 0;
-
-				if (B > 255) B = 255;
-				if (B < 0) B = 0;
-
-				m_renderTarget(x, y, 0, 0) = (unsigned char)R;
-				m_renderTarget(x, y, 0, 1) = (unsigned char)G;
-				m_renderTarget(x, y, 0, 2) = (unsigned char)B;
-			}
-		}
 	}
 	
 	cimg_library::CImg<unsigned char> Camera::GetRenderTarget()
 	{
 		return m_renderTarget;
+	}
+
+	void Camera::SaveRender(const char* filename)
+	{
+		const char* extension = ".ppm";
+		std::string outputName;
+
+		for (int i = 0; i < m_postProcessGroups.size(); i++)
+		{
+			outputName.clear();
+			outputName.append(filename);
+			outputName.append(m_postProcessGroups[i]->GroupName());
+			outputName.append(extension);
+
+			m_postProcessGroups[i]->Apply(m_rawHDRBuffer, m_postProcessBuffer, m_width, m_height);
+
+			// Place final result in the cimg render target
+			for (int y = 0; y < m_height; y++)
+			{
+				for (int x = 0; x < m_width; x++)
+				{
+					glm::vec3 color = m_postProcessBuffer[y][x];
+
+					unsigned char r = glm::clamp((unsigned char)(color.r * 255), (unsigned char)0, (unsigned char)255);
+					unsigned char g = glm::clamp((unsigned char)(color.g * 255), (unsigned char)0, (unsigned char)255);
+					unsigned char b = glm::clamp((unsigned char)(color.b * 255), (unsigned char)0, (unsigned char)255);
+
+					int R = color.r * 255;
+					int G = color.g * 255;
+					int B = color.b * 255;
+
+					if (R > 255) R = 255;
+					if (R < 0) R = 0;
+
+					if (G > 255) G = 255;
+					if (G < 0) G = 0;
+
+					if (B > 255) B = 255;
+					if (B < 0) B = 0;
+
+					m_renderTarget(x, y, 0, 0) = (unsigned char)R;
+					m_renderTarget(x, y, 0, 1) = (unsigned char)G;
+					m_renderTarget(x, y, 0, 2) = (unsigned char)B;
+				}
+			}
+
+			m_renderTarget.save(outputName.c_str());
+		}
 	}
 
 	void Camera::ThreadRender(Scene * scene)
@@ -168,7 +181,7 @@ namespace RayTracer
 			m_renderMutex.lock();
 
 			// Store color in the hdr buffer
-			m_hdrBuffer[y][x] = color;
+			m_rawHDRBuffer[y][x] = color;
 
 			m_renderMutex.unlock();
 		}

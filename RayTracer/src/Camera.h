@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include "CImg.h"
 #include "Core.h"
-#include "PostProcesses/PostProcess.h"
+#include "PostProcesses/PostProcessGroup.h"
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -18,7 +18,8 @@ namespace RayTracer
 
 	public:
 		Camera(unsigned int width = 1920, unsigned int height = 1080, float fov = 90, glm::vec3 position = { 0,0,0 }, glm::vec3 lookAt = { 0.0f, 0.0f, -1.0f }, float lensRadius = 0.045f, glm::vec3 upVector = { 0,1,0 });
-		void AddPostProcess(PostProcess* process);
+		void AddPostProcessGroup(PostProcessGroup* processGroup);
+		void SaveRender(const char* filename);
 
 	protected:
 		void Render(Scene* scene);
@@ -29,11 +30,12 @@ namespace RayTracer
 		float m_fov, m_focalDistance, m_lensRadius;
 		glm::vec3 m_position;
 		glm::mat4 m_worldToCamera, m_cameraToWorld;
-		glm::vec3** m_hdrBuffer;
+		glm::vec3** m_rawHDRBuffer;
+		glm::vec3** m_postProcessBuffer;
 		cimg_library::CImg<unsigned char> m_renderTarget;
 		std::mutex m_renderMutex;
 		std::queue<std::pair<int, int>> m_renderQueue;
-		std::vector<PostProcess*> m_postProcesses;
+		std::vector<PostProcessGroup*> m_postProcessGroups;
 
 		void ThreadRender(Scene* scene);
 	};

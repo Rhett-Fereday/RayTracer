@@ -8,7 +8,7 @@ namespace RayTracer
 		m_camera = camera;
 		m_objects = std::vector<Object*>();
 		m_lights = std::vector<Light*>();
-		m_recursionLimit = 16;
+		m_recursionLimit = 4;
 	}
 
 	void Scene::AddObject(Object* object)
@@ -28,7 +28,7 @@ namespace RayTracer
 	
 	void Scene::SaveScene(const char* filename)
 	{
-		m_camera->GetRenderTarget().save(filename);
+		m_camera->SaveRender(filename);
 	}
 
 	// Primary method for ray-tracing the scene

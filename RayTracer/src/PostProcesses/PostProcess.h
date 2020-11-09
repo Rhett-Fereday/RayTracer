@@ -8,7 +8,6 @@ namespace RayTracer
 	class RT_API PostProcess
 	{
 	public:
-
-		virtual glm::vec3** Apply(glm::vec3** inputImage, int width, int height) = 0;
+		virtual void Apply(glm::vec3** inputImage, glm::vec3** outputImage, int width, int height) = 0;
 	};
 }
