@@ -24,7 +24,7 @@ namespace RayTracer
 
         m_worldToCamera = glm::lookAt(position, lookAt, upVector);
         m_cameraToWorld = glm::inverse(m_worldToCamera);
-		m_raysPerPixel = 2048;
+		m_raysPerPixel = 8192;
 		m_numberOfThreads = std::thread::hardware_concurrency();
 
 		m_focalDistance = glm::distance(position, lookAt); // Set focus plane to the point we want to look at

@@ -24,16 +24,24 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(300, 300, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
+	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
+
+	PostProcessGroup modifiedReinhardGCGroup = PostProcessGroup("_ModifiedReinhard+GC");
+	modifiedReinhardGCGroup.AddPostProcess(new ModifiedReinhard());
+	modifiedReinhardGCGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&modifiedReinhardGCGroup);
+
+	PostProcessGroup naiveReinhardGCGroup = PostProcessGroup("_NaiveReinhard+GC");
+	naiveReinhardGCGroup.AddPostProcess(new NaiveReinhard());
+	naiveReinhardGCGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&naiveReinhardGCGroup);
 
 	PostProcessGroup modifiedReinhardGroup = PostProcessGroup("_ModifiedReinhard");
 	modifiedReinhardGroup.AddPostProcess(new ModifiedReinhard());
-	modifiedReinhardGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&modifiedReinhardGroup);
 
 	PostProcessGroup naiveReinhardGroup = PostProcessGroup("_NaiveReinhard");
 	naiveReinhardGroup.AddPostProcess(new NaiveReinhard());
-	naiveReinhardGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&naiveReinhardGroup);
 
 	Scene scene(&camera);
@@ -48,7 +56,7 @@ int main(int argc, char* argv[])
 	ConstMaterial mintGreenMat; mintGreenMat.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f };
 	ConstMaterial blueMat; blueMat.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f };
 	ConstMaterial blackMat; blackMat.albedo = { 0,0,0 };
-	ConstMaterial copperMat; copperMat.albedo = { 1.00, 0.71, 0.29 }; copperMat.isMetal = true; copperMat.roughness = 0.2f;
+	ConstMaterial goldMat; goldMat.albedo = { 1.00, 0.71, 0.29 }; goldMat.isMetal = true; goldMat.roughness = 0.3f;
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
@@ -102,7 +110,7 @@ int main(int argc, char* argv[])
 
 	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.3, -0.3 });
 	transform = glm::scale(transform, { 0.3,0.3,0.3 });
-	Sphere leftSphere = Sphere(transform, &copperMat);
+	Sphere leftSphere = Sphere(transform, &goldMat);
 	scene.AddObject(&leftSphere);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
