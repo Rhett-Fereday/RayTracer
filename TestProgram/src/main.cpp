@@ -13,6 +13,7 @@
 #include "Lights/RectLight.h"
 #include "PostProcesses/PostProcessGroup.h"
 #include "PostProcesses/ModifiedReinhard.h"
+#include "PostProcesses/NaiveReinhard.h"
 #include "PostProcesses/GammaCorrection.h"
 #include <time.h>
 #include <iostream>
@@ -23,29 +24,31 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
+	Camera camera = RayTracer::Camera(300, 300, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
 
-	PostProcessGroup gammaGroup = PostProcessGroup("_ModifiedReinhard+GammaCorrection");
-	gammaGroup.AddPostProcess(new ModifiedReinhard());
-	gammaGroup.AddPostProcess(new GammaCorrection());
-	camera.AddPostProcessGroup(&gammaGroup);
+	PostProcessGroup modifiedReinhardGroup = PostProcessGroup("_ModifiedReinhard");
+	modifiedReinhardGroup.AddPostProcess(new ModifiedReinhard());
+	modifiedReinhardGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&modifiedReinhardGroup);
 
-	PostProcessGroup nonGammaGroup = PostProcessGroup("_ModifiedReinhard");
-	nonGammaGroup.AddPostProcess(new ModifiedReinhard());
-	camera.AddPostProcessGroup(&nonGammaGroup);
+	PostProcessGroup naiveReinhardGroup = PostProcessGroup("_NaiveReinhard");
+	naiveReinhardGroup.AddPostProcess(new NaiveReinhard());
+	naiveReinhardGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&naiveReinhardGroup);
 
 	Scene scene(&camera);
 	
 	// Create the materials to be used in the scene
-	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
-	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
-	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
+	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f }; greenWallMat.roughness = 0.8f;
+	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 }; whiteMat.roughness = 0.8f;
+	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f }; redWallMat.roughness = 0.8f;
 	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 25.0f;
-	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 1.0f;
+	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 5.0f;
 	ConstMaterial whiteAreaLightMat; whiteAreaLightMat.albedo = { 1,1,1 }; whiteAreaLightMat.emissiveStrength = 1.0f;
 	ConstMaterial mintGreenMat; mintGreenMat.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f };
 	ConstMaterial blueMat; blueMat.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f };
 	ConstMaterial blackMat; blackMat.albedo = { 0,0,0 };
+	ConstMaterial copperMat; copperMat.albedo = { 1.00, 0.71, 0.29 }; copperMat.isMetal = true; copperMat.roughness = 0.2f;
 
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
 	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
@@ -55,12 +58,12 @@ int main(int argc, char* argv[])
 	Box fakeLight2 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
 	//scene.AddObject(&fakeLight2);
 
-	PointLight pointLight = PointLight({ 1,1,1 }, 10, { 0, 0.1, 0 });
+	PointLight pointLight = PointLight({ 1,1,1 }, 1, { 0, 0.65, 0 });
 	//scene.AddLight(&pointLight);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0, 1.299, 0 });
 	transform = glm::rotate(transform, glm::radians(90.0f), { 1,0,0 });
-	RectLight rectLight = RectLight(transform, 0.25f, 0.25f, &whiteAreaLightMat);
+	RectLight rectLight = RectLight(transform, 0.25f, 0.25f, &yellowAreaLightMat);
 	scene.AddObject(&rectLight);
 	scene.AddLight(&rectLight);
 
@@ -92,10 +95,15 @@ int main(int argc, char* argv[])
 	Box backWall = Box(transform, &whiteMat, { 2,2,0.05 });
 	scene.AddObject(&backWall);
 
-	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.4, -0.3 });
+	/*transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.4, -0.3 });
 	transform = glm::rotate(transform, glm::radians(20.0f), { 0,1,0 });
 	Box leftBox = Box(transform, &whiteMat, { 0.4, 0.8, 0.4 });
-	scene.AddObject(&leftBox);
+	scene.AddObject(&leftBox);*/
+
+	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.3, -0.3 });
+	transform = glm::scale(transform, { 0.3,0.3,0.3 });
+	Sphere leftSphere = Sphere(transform, &copperMat);
+	scene.AddObject(&leftSphere);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
 	transform = glm::rotate(transform, glm::radians(-20.0f), { 0,1,0 });

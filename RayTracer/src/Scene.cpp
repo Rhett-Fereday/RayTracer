@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "RTMath.h"
+#include <algorithm>
 
 namespace RayTracer
 {
@@ -58,17 +59,16 @@ namespace RayTracer
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
 			if (depth > 1) return intensity;
-			else
-			{
-				float incidence = std::max(0.0f, glm::dot(hitInformation.hitNormal, -ray));
 
-				return hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
-			}
+			else return hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
 		}
 
 		glm::vec3 indirectComponent = { 0,0,0 };
 		glm::vec3 directComponent = { 0,0,0 };
 
+		glm::vec3 F0 = glm::vec3(0.04f);
+		F0 = glm::mix(F0, hitInformation.hitMaterial->albedo, hitInformation.hitMaterial->isMetal);
+		
 		// Calculate direct component
 		for (int i = 0; i < m_lights.size(); i++)
 		{
@@ -76,10 +76,10 @@ namespace RayTracer
 			float pdf;
 			float sampleDistance;
 			glm::vec3 irradiance = m_lights[i]->SampleRadiance(hitInformation.hitPosition, hitInformation.hitNormal, occlusionRay, pdf, sampleDistance);
-			
+
 			HitInfo occlusionInfo;
 			bool occluded = TestIntersection(hitInformation.hitPosition + 0.0001f * occlusionRay, occlusionRay, occlusionInfo, false);
-			
+
 			if (occluded)
 			{
 				if (occlusionInfo.hitDistance < sampleDistance)
@@ -88,8 +88,25 @@ namespace RayTracer
 				}
 			}
 
-			directComponent += irradiance / pdf;
-		}
+			// Cook-Torrance BRDF. Ignore specular component for direct lighting
+			glm::vec3 halfwayVector = glm::normalize(-ray + occlusionRay);
+
+			float NDF = RTMath::DistributionGGX(hitInformation.hitNormal, halfwayVector, hitInformation.hitMaterial->roughness);
+			float G = RTMath::GeometrySmith(hitInformation.hitNormal, -ray, occlusionRay, hitInformation.hitMaterial->roughness);
+			glm::vec3 F = RTMath::FresnelSchlick(std::max(dot(halfwayVector, -ray), 0.0f), F0);
+
+			glm::vec3 kS = F;
+			glm::vec3 kD = glm::vec3(1.0) - kS;
+			kD *= 1.0 - hitInformation.hitMaterial->isMetal;
+
+			glm::vec3 numerator = NDF * G * F;
+			float denominator = 4.0 * std::max(dot(hitInformation.hitNormal, -ray), 0.0f) * std::max(dot(hitInformation.hitNormal, occlusionRay), 0.0f);
+			glm::vec3 specular = numerator / std::max(denominator, 0.001f);
+
+			glm::vec3 contribution = (kD * hitInformation.hitMaterial->albedo + specular) * irradiance;
+
+			directComponent += contribution / pdf;
+		}		
 
 		//Calculate the indirect component
 		{
@@ -108,14 +125,31 @@ namespace RayTracer
 			float c = sqrt(1.0f - rand2);
 
 			glm::vec3 indirectSample = glm::normalize(a * u + b * v + c * w);
-			float cos_theta = std::max(0.0f, glm::dot(hitInformation.hitNormal, indirectSample));
-			indirectComponent = TraceRay(hitInformation.hitPosition + 0.001f * indirectSample, indirectSample, { 1,1,1 }, depth + 1);
+			glm::vec3 indirectIrradiance = TraceRay(hitInformation.hitPosition + 0.001f * indirectSample, indirectSample, { 1,1,1 }, depth + 1);
+
+			// Cook-Torrance BRDF
+			glm::vec3 halfwayVector = glm::normalize(-ray + indirectSample);
+
+			float NDF = RTMath::DistributionGGX(hitInformation.hitNormal, halfwayVector, hitInformation.hitMaterial->roughness);
+			float G = RTMath::GeometrySmith(hitInformation.hitNormal, -ray, indirectSample, hitInformation.hitMaterial->roughness);
+			glm::vec3 F = RTMath::FresnelSchlick(std::max(dot(halfwayVector, -ray), 0.0f), F0);
+
+			glm::vec3 kS = F;
+			glm::vec3 kD = glm::vec3(1.0) - kS;
+			kD *= 1.0 - hitInformation.hitMaterial->isMetal;
+
+			glm::vec3 numerator = NDF * G * F;
+			float denominator = 4.0 * std::max(dot(hitInformation.hitNormal, -ray), 0.0f) * std::max(dot(hitInformation.hitNormal, indirectSample), 0.0f);
+			glm::vec3 specular = numerator / std::max(denominator, 0.001f);
+
+			glm::vec3 contribution = (kD * hitInformation.hitMaterial->albedo + specular) * indirectIrradiance;
+
+			indirectComponent = contribution;
 		}
 
-		float cos_theta_prime = std::max(0.0f, glm::dot(hitInformation.hitNormal, glm::normalize(-ray)));
 		glm::vec3 totalLighting = directComponent + indirectComponent;
 
-		return totalLighting * hitInformation.hitMaterial->albedo;
+		return totalLighting;// *hitInformation.hitMaterial->albedo;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.
