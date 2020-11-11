@@ -54,6 +54,9 @@
     <ClInclude Include="src\PostProcesses\GammaCorrection.h">
       <Filter>PostProcesses</Filter>
     </ClInclude>
+    <ClInclude Include="src\PostProcesses\GaussianBlur.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
     <ClInclude Include="src\PostProcesses\ModifiedReinhard.h">
       <Filter>PostProcesses</Filter>
     </ClInclude>
@@ -109,6 +112,9 @@
       <Filter>Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\PostProcesses\GammaCorrection.cpp">
+      <Filter>PostProcesses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcesses\GaussianBlur.cpp">
       <Filter>PostProcesses</Filter>
     </ClCompile>
     <ClCompile Include="src\PostProcesses\ModifiedReinhard.cpp">

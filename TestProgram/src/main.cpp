@@ -13,7 +13,7 @@
 #include "Lights/RectLight.h"
 #include "PostProcesses/PostProcessGroup.h"
 #include "PostProcesses/ModifiedReinhard.h"
-#include "PostProcesses/NaiveReinhard.h"
+#include "PostProcesses/GaussianBlur.h"
 #include "PostProcesses/GammaCorrection.h"
 #include <time.h>
 #include <iostream>
@@ -24,59 +24,45 @@ int main(int argc, char* argv[])
 {
 	// Create the camera and create a scene with it
 
-	Camera camera = RayTracer::Camera(640, 480, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
+	Camera camera = RayTracer::Camera(500, 500, 45.0f, { 0,0.65,2 }, { 0,0.65,0 }, 0.0001);
 
-	PostProcessGroup modifiedReinhardGCGroup = PostProcessGroup("_ModifiedReinhard+GC");
+	PostProcessGroup modifiedReinhardGCGroup = PostProcessGroup("_MR+GC");
 	modifiedReinhardGCGroup.AddPostProcess(new ModifiedReinhard());
 	modifiedReinhardGCGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&modifiedReinhardGCGroup);
 
-	PostProcessGroup naiveReinhardGCGroup = PostProcessGroup("_NaiveReinhard+GC");
-	naiveReinhardGCGroup.AddPostProcess(new NaiveReinhard());
-	naiveReinhardGCGroup.AddPostProcess(new GammaCorrection());
-	camera.AddPostProcessGroup(&naiveReinhardGCGroup);
-
-	PostProcessGroup modifiedReinhardGroup = PostProcessGroup("_ModifiedReinhard");
-	modifiedReinhardGroup.AddPostProcess(new ModifiedReinhard());
-	camera.AddPostProcessGroup(&modifiedReinhardGroup);
-
-	PostProcessGroup naiveReinhardGroup = PostProcessGroup("_NaiveReinhard");
-	naiveReinhardGroup.AddPostProcess(new NaiveReinhard());
-	camera.AddPostProcessGroup(&naiveReinhardGroup);
+	PostProcessGroup gaussianBlurGroup = PostProcessGroup("_GB+MR+GC");
+	gaussianBlurGroup.AddPostProcess(new GaussianBlur(7, 0.8f));
+	gaussianBlurGroup.AddPostProcess(new ModifiedReinhard());
+	gaussianBlurGroup.AddPostProcess(new GammaCorrection());	
+	camera.AddPostProcessGroup(&gaussianBlurGroup);
 
 	Scene scene(&camera);
 	
 	// Create the materials to be used in the scene
-	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f }; greenWallMat.roughness = 0.8f;
-	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 }; whiteMat.roughness = 0.8f;
-	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f }; redWallMat.roughness = 0.8f;
-	ConstMaterial areaLightMat; areaLightMat.albedo = { 1,1,1 }; areaLightMat.emissiveStrength = 25.0f;
-	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 5.0f;
-	ConstMaterial whiteAreaLightMat; whiteAreaLightMat.albedo = { 1,1,1 }; whiteAreaLightMat.emissiveStrength = 1.0f;
+	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
+	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
+	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
+	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 15.0f;
+	ConstMaterial whiteAreaLightMat; whiteAreaLightMat.albedo = { 1,1,1 }; whiteAreaLightMat.emissiveStrength = 20.0f;
 	ConstMaterial mintGreenMat; mintGreenMat.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f };
 	ConstMaterial blueMat; blueMat.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f };
 	ConstMaterial blackMat; blackMat.albedo = { 0,0,0 };
-	ConstMaterial goldMat; goldMat.albedo = { 1.00, 0.71, 0.29 }; goldMat.isMetal = true; goldMat.roughness = 0.3f;
-
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.4, 1.5, 0 });
-	Box fakeLight1 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	//scene.AddObject(&fakeLight1);
-
-	transform = glm::translate(glm::mat4(1.0f), { 0.4, 1.5, 0 });
-	Box fakeLight2 = Box(transform, &areaLightMat, { 0.5, 0.0001, 0.5 });
-	//scene.AddObject(&fakeLight2);
+	ConstMaterial goldMat; goldMat.albedo = { 1.00, 0.71, 0.29 }; goldMat.isMetal = true; goldMat.roughness = 0.5f;
+	ConstMaterial silverMat; silverMat.albedo = { 0.95, 0.93, 0.88 }; silverMat.isMetal = true; silverMat.roughness = 0.3f;
+	ConstMaterial whiteShinyMat; whiteShinyMat.roughness = 0.2;
 
 	PointLight pointLight = PointLight({ 1,1,1 }, 1, { 0, 0.65, 0 });
 	//scene.AddLight(&pointLight);
 
-	transform = glm::translate(glm::mat4(1.0f), { 0, 1.299, 0 });
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.299, 0 });
 	transform = glm::rotate(transform, glm::radians(90.0f), { 1,0,0 });
 	RectLight rectLight = RectLight(transform, 0.25f, 0.25f, &yellowAreaLightMat);
 	scene.AddObject(&rectLight);
 	scene.AddLight(&rectLight);
 
 	// Load the meshes for the scene
-	//Mesh teapotMesh = Mesh("teapot.obj", 11);
+	Mesh teapotMesh = Mesh("teapot.obj", 11);
 	//Mesh bunnyMesh = Mesh("bunny_very_hi.obj", 15);
 	//Mesh teacupMesh = Mesh("teacup.obj", 14);
 	//Mesh amphoraMesh = Mesh("amphora.obj", 10);
@@ -110,13 +96,19 @@ int main(int argc, char* argv[])
 
 	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.3, -0.3 });
 	transform = glm::scale(transform, { 0.3,0.3,0.3 });
-	Sphere leftSphere = Sphere(transform, &goldMat);
+	Sphere leftSphere = Sphere(transform, &whiteShinyMat);
 	scene.AddObject(&leftSphere);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
 	transform = glm::rotate(transform, glm::radians(-20.0f), { 0,1,0 });
 	Box rightBox = Box(transform, &whiteMat, { 0.4, 0.4, 0.4 });
 	scene.AddObject(&rightBox);
+
+	transform = glm::translate(glm::mat4(1.0f), { 0.25,0.4,0.2 });
+	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
+	transform = glm::scale(transform, { 0.025/3.0, 0.025/3.0, 0.025/3.0 });
+	MeshInstance teapot = MeshInstance(&teapotMesh, transform, &silverMat);
+	scene.AddObject(&teapot);
 
 
 	// Render and save the image. The image saves in the TestProgram folder (when I run the project that's where VS puts it at least)

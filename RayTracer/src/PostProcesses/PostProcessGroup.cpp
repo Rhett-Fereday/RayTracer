@@ -16,7 +16,8 @@ namespace RayTracer
 	{
 		for (int i = 0; i < m_processes.size(); i++)
 		{
-			m_processes[i]->Apply(inputImage, outputImage, width, height);
+			if(i == 0) m_processes[i]->Apply(inputImage, outputImage, width, height);
+			else m_processes[i]->Apply(outputImage, outputImage, width, height);
 		}
 	}
 
