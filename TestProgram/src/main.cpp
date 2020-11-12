@@ -14,6 +14,7 @@
 #include "PostProcesses/PostProcessGroup.h"
 #include "PostProcesses/ModifiedReinhard.h"
 #include "PostProcesses/GaussianBlur.h"
+#include "PostProcesses/BilateralFilter.h"
 #include "PostProcesses/GammaCorrection.h"
 #include <time.h>
 #include <iostream>
@@ -31,11 +32,23 @@ int main(int argc, char* argv[])
 	modifiedReinhardGCGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&modifiedReinhardGCGroup);
 
-	PostProcessGroup gaussianBlurGroup = PostProcessGroup("_GB+MR+GC");
-	gaussianBlurGroup.AddPostProcess(new GaussianBlur(7, 0.8f));
-	gaussianBlurGroup.AddPostProcess(new ModifiedReinhard());
-	gaussianBlurGroup.AddPostProcess(new GammaCorrection());	
-	camera.AddPostProcessGroup(&gaussianBlurGroup);
+	PostProcessGroup bilateralFilterGroup1 = PostProcessGroup("_BF1+MR+GC");
+	bilateralFilterGroup1.AddPostProcess(new BilateralFilter(15, 16.0f, 0.05f));
+	bilateralFilterGroup1.AddPostProcess(new ModifiedReinhard());
+	bilateralFilterGroup1.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&bilateralFilterGroup1);
+
+	PostProcessGroup bilateralFilterGroup2 = PostProcessGroup("_BF2+MR+GC");
+	bilateralFilterGroup2.AddPostProcess(new BilateralFilter(15, 32.0f, 0.05f));
+	bilateralFilterGroup2.AddPostProcess(new ModifiedReinhard());
+	bilateralFilterGroup2.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&bilateralFilterGroup2);
+
+	PostProcessGroup bilateralFilterGroup3 = PostProcessGroup("_BF3+MR+GC");
+	bilateralFilterGroup3.AddPostProcess(new BilateralFilter(15, 64.0f, 0.05f));
+	bilateralFilterGroup3.AddPostProcess(new ModifiedReinhard());
+	bilateralFilterGroup3.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&bilateralFilterGroup3);
 
 	Scene scene(&camera);
 	

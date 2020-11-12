@@ -336,5 +336,14 @@ namespace RayTracer
 		{
 			return F0 + (1.0f - F0) * pow(1.0f - cosTheta, 5.0f);
 		}
+
+		float Gaussian(float distance, float sigma)
+		{
+			float sigma2 = sigma * sigma;
+			float left = 1.0f / (2.0f * 3.14f * sigma2);
+			float right = exp(-1.0f * (distance * distance) / (2.0f * sigma2));
+
+			return left * right;
+		}
 	}
 }

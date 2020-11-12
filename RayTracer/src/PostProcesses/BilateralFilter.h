@@ -5,15 +5,15 @@
 
 namespace RayTracer
 {
-	class RT_API GaussianBlur : public PostProcess
+	class RT_API BilateralFilter : public PostProcess
 	{
 	public:
-		GaussianBlur(int size, float sigma);
+		BilateralFilter(int size, float sigmaS, float sigmaR);
 		void Apply(glm::vec3** inputImage, glm::vec3** outputImage, int width, int height);
 
 	private:
 		int m_size;
-		float m_sigma;
+		float m_sigmaS, m_sigmaR;
 		float** m_kernel;
 	};
 }

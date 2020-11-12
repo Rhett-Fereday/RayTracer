@@ -51,6 +51,9 @@
     <ClInclude Include="src\Objects\Sphere.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\PostProcesses\BilateralFilter.h">
+      <Filter>PostProcesses</Filter>
+    </ClInclude>
     <ClInclude Include="src\PostProcesses\GammaCorrection.h">
       <Filter>PostProcesses</Filter>
     </ClInclude>
@@ -110,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="src\Objects\Sphere.cpp">
       <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostProcesses\BilateralFilter.cpp">
+      <Filter>PostProcesses</Filter>
     </ClCompile>
     <ClCompile Include="src\PostProcesses\GammaCorrection.cpp">
       <Filter>PostProcesses</Filter>
