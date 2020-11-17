@@ -6,6 +6,7 @@
 #include "Objects/Object.h"
 #include "Core.h"
 #include "Lights/Light.h"
+#include "GBufferInfo.h"
 
 namespace RayTracer
 {
@@ -26,7 +27,7 @@ namespace RayTracer
 		std::vector<Light*> m_lights;
 		int m_recursionLimit;
 
-		glm::vec3 TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth);
+		GBufferInfo TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth);
 		bool TestIntersection(const glm::vec3& rayOrigin, const glm::vec3& ray, HitInfo& hitInformation, bool includeTransparentObjects = true, bool includeEmissiveObjects = false);
 	};
 }

@@ -9,6 +9,6 @@ namespace RayTracer
 	{
 	public:
 		GammaCorrection();
-		void Apply(glm::vec3** inputImage, glm::vec3** outputImage, int width, int height);
+		void Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height);
 	};
 }

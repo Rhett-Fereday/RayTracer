@@ -6,6 +6,7 @@
 #include "CImg.h"
 #include "Core.h"
 #include "PostProcesses/PostProcessGroup.h"
+#include "GBufferInfo.h"
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -30,8 +31,8 @@ namespace RayTracer
 		float m_fov, m_focalDistance, m_lensRadius;
 		glm::vec3 m_position;
 		glm::mat4 m_worldToCamera, m_cameraToWorld;
-		glm::vec3** m_rawHDRBuffer;
-		glm::vec3** m_postProcessBuffer;
+		std::vector<std::vector<GBufferInfo>> m_rawBuffer;
+		std::vector<std::vector<GBufferInfo>> m_postProcessBuffer;
 		cimg_library::CImg<unsigned char> m_renderTarget;
 		std::mutex m_renderMutex;
 		std::queue<std::pair<int, int>> m_renderQueue;

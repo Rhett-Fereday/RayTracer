@@ -3,9 +3,9 @@
 
 namespace RayTracer
 {
-	BilateralFilter::BilateralFilter(int size, float sigmaS, float sigmaR)
+	BilateralFilter::BilateralFilter(float sigmaS, float sigmaR)
 	{
-		m_size = (size % 2) == 0 ? size + 1 : size;
+		m_size = 2 * ceil(sigmaS) + 1;
 		m_sigmaS = sigmaS;
 		m_sigmaR = sigmaR;
 
@@ -40,7 +40,7 @@ namespace RayTracer
 		}
 	}
 
-	void BilateralFilter::Apply(glm::vec3 ** inputImage, glm::vec3 ** outputImage, int width, int height)
+	void BilateralFilter::Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height)
 	{
 		for (int y = 0; y < height; y++)
 		{
@@ -59,7 +59,7 @@ namespace RayTracer
 						int newY = y + j - int(m_size / 2);
 						if ((newY < 0) || (newY >= height)) continue;
 
-						glm::vec3 colorDifference = glm::abs(inputImage[y][x] - inputImage[newY][newX]);
+						glm::vec3 colorDifference = glm::abs((*inputImage)[y][x].color - (*inputImage)[newY][newX].color);
 						glm::vec3 rangeWeights = { 0,0,0 };
 
 						rangeWeights.r = RTMath::Gaussian(colorDifference.r, m_sigmaR);
@@ -69,11 +69,11 @@ namespace RayTracer
 						glm::vec3 value = m_kernel[i][j] * rangeWeights;
 						normalization += value;
 
-						blurredColor += inputImage[newY][newX] * value;
+						blurredColor += (*inputImage)[newY][newX].color * value;
 					}
 				}
 
-				outputImage[y][x] = blurredColor / normalization;
+				(*outputImage)[y][x].color = blurredColor / normalization;
 			}
 		}
 	}

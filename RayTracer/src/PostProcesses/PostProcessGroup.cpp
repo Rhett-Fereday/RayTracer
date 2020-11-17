@@ -12,7 +12,7 @@ namespace RayTracer
 		m_processes.push_back(postProcess);
 	}
 
-	void PostProcessGroup::Apply(glm::vec3** inputImage, glm::vec3** outputImage, int width, int height)
+	void PostProcessGroup::Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height)
 	{
 		for (int i = 0; i < m_processes.size(); i++)
 		{

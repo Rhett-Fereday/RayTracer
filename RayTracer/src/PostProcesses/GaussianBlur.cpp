@@ -3,9 +3,9 @@
 
 namespace RayTracer
 {
-	GaussianBlur::GaussianBlur(int size, float sigma)
+	GaussianBlur::GaussianBlur(float sigma)
 	{
-		m_size = (size % 2) == 0 ? size + 1 : size;
+		m_size = 2 * ceil(sigma) + 1;
 		m_sigma = sigma;
 
 		int centerX = m_size / 2;
@@ -39,7 +39,7 @@ namespace RayTracer
 		}
 	}
 
-	void GaussianBlur::Apply(glm::vec3 ** inputImage, glm::vec3 ** outputImage, int width, int height)
+	void GaussianBlur::Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height)
 	{
 		for (int y = 0; y < height; y++)
 		{
@@ -57,11 +57,11 @@ namespace RayTracer
 						int newY = y + j - int(m_size / 2);
 						if ((newY < 0) || (newY >= height)) continue;
 
-						blurredColor += inputImage[newY][newX] * m_kernel[i][j];
+						blurredColor += (*inputImage)[newY][newX].color * m_kernel[i][j];
 					}
 				}
 
-				outputImage[y][x] = blurredColor;
+				(*outputImage)[y][x].color = blurredColor;
 			}
 		}
 	}

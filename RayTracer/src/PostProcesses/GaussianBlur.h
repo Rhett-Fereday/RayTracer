@@ -8,8 +8,8 @@ namespace RayTracer
 	class RT_API GaussianBlur : public PostProcess
 	{
 	public:
-		GaussianBlur(int size, float sigma);
-		void Apply(glm::vec3** inputImage, glm::vec3** outputImage, int width, int height);
+		GaussianBlur(float sigma);
+		void Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height);
 
 	private:
 		int m_size;

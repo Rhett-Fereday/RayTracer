@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "RTMath.h"
+#include "GBufferInfo.h"
 #include <algorithm>
 
 namespace RayTracer
@@ -33,12 +34,16 @@ namespace RayTracer
 	}
 
 	// Primary method for ray-tracing the scene
-	glm::vec3 Scene::TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth)
+	GBufferInfo Scene::TraceRay(const glm::vec3& rayOrigin, const glm::vec3& ray, glm::vec3 rayIntensity, const int& depth)
 	{
 		// Default return value
-		glm::vec3 intensity = glm::vec3(0, 0, 0);
+		GBufferInfo defaultInfo;
+		defaultInfo.albedo = { 0,0,0 };
+		defaultInfo.color = { 0,0,0 };
+		defaultInfo.normal = { 0,0,0 };
+		defaultInfo.position = { 0,0,0 };
 
-		if (depth > m_recursionLimit) return intensity;
+		if (depth > m_recursionLimit) return defaultInfo;
 
 		HitInfo hitInformation;
 		bool intersectsObject;
@@ -54,14 +59,28 @@ namespace RayTracer
 		}
 
 		// No intersection - return default value
-		if (!intersectsObject) return intensity;		
+		if (!intersectsObject) return defaultInfo;		
 
 		if (hitInformation.hitMaterial->emissiveStrength > 0)
 		{
-			if (depth > 1) return intensity;
+			if (depth > 1) return defaultInfo;
+			else
+			{
+				GBufferInfo info;
+				info.albedo = hitInformation.hitMaterial->albedo;
+				info.color = hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
+				info.normal = hitInformation.hitNormal;
+				info.position = hitInformation.hitPosition;
 
-			else return hitInformation.hitMaterial->emissiveStrength * hitInformation.hitMaterial->albedo;
+				return info;
+			}
 		}
+
+		// Prep return info
+		GBufferInfo info;
+		info.albedo = hitInformation.hitMaterial->albedo;
+		info.normal = hitInformation.hitNormal;
+		info.position = hitInformation.hitPosition;
 
 		glm::vec3 indirectComponent = { 0,0,0 };
 		glm::vec3 directComponent = { 0,0,0 };
@@ -106,7 +125,7 @@ namespace RayTracer
 			glm::vec3 contribution = (kD * hitInformation.hitMaterial->albedo + specular) * irradiance;
 
 			directComponent += contribution / pdf;
-		}		
+		}
 
 		//Calculate the indirect component
 		{
@@ -125,7 +144,7 @@ namespace RayTracer
 			float c = sqrt(1.0f - rand2);
 
 			glm::vec3 indirectSample = glm::normalize(a * u + b * v + c * w);
-			glm::vec3 indirectIrradiance = TraceRay(hitInformation.hitPosition + 0.001f * indirectSample, indirectSample, { 1,1,1 }, depth + 1);
+			GBufferInfo indirectInfo = TraceRay(hitInformation.hitPosition + 0.001f * indirectSample, indirectSample, { 1,1,1 }, depth + 1);
 
 			// Cook-Torrance BRDF
 			glm::vec3 halfwayVector = glm::normalize(-ray + indirectSample);
@@ -142,14 +161,14 @@ namespace RayTracer
 			float denominator = 4.0 * std::max(dot(hitInformation.hitNormal, -ray), 0.0f) * std::max(dot(hitInformation.hitNormal, indirectSample), 0.0f);
 			glm::vec3 specular = numerator / std::max(denominator, 0.001f);
 
-			glm::vec3 contribution = (kD * hitInformation.hitMaterial->albedo + specular) * indirectIrradiance;
+			glm::vec3 contribution = (kD * hitInformation.hitMaterial->albedo + specular) * indirectInfo.color;
 
 			indirectComponent = contribution;
 		}
 
-		glm::vec3 totalLighting = directComponent + indirectComponent;
+		info.color = directComponent + indirectComponent;
 
-		return totalLighting;// *hitInformation.hitMaterial->albedo;
+		return info;
 	}
 
 	// Generic object intersection test. Will certainly benefit from some acceleration structure in more complex scenes.

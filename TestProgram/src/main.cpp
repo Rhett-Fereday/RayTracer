@@ -15,6 +15,7 @@
 #include "PostProcesses/ModifiedReinhard.h"
 #include "PostProcesses/GaussianBlur.h"
 #include "PostProcesses/BilateralFilter.h"
+#include "PostProcesses/ExtendedBilateralFilter.h"
 #include "PostProcesses/GammaCorrection.h"
 #include <time.h>
 #include <iostream>
@@ -32,23 +33,11 @@ int main(int argc, char* argv[])
 	modifiedReinhardGCGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&modifiedReinhardGCGroup);
 
-	PostProcessGroup bilateralFilterGroup1 = PostProcessGroup("_BF1+MR+GC");
-	bilateralFilterGroup1.AddPostProcess(new BilateralFilter(15, 16.0f, 0.05f));
-	bilateralFilterGroup1.AddPostProcess(new ModifiedReinhard());
-	bilateralFilterGroup1.AddPostProcess(new GammaCorrection());
-	camera.AddPostProcessGroup(&bilateralFilterGroup1);
-
-	PostProcessGroup bilateralFilterGroup2 = PostProcessGroup("_BF2+MR+GC");
-	bilateralFilterGroup2.AddPostProcess(new BilateralFilter(15, 32.0f, 0.05f));
-	bilateralFilterGroup2.AddPostProcess(new ModifiedReinhard());
-	bilateralFilterGroup2.AddPostProcess(new GammaCorrection());
-	camera.AddPostProcessGroup(&bilateralFilterGroup2);
-
-	PostProcessGroup bilateralFilterGroup3 = PostProcessGroup("_BF3+MR+GC");
-	bilateralFilterGroup3.AddPostProcess(new BilateralFilter(15, 64.0f, 0.05f));
-	bilateralFilterGroup3.AddPostProcess(new ModifiedReinhard());
-	bilateralFilterGroup3.AddPostProcess(new GammaCorrection());
-	camera.AddPostProcessGroup(&bilateralFilterGroup3);
+	PostProcessGroup extendedBilateralFilterGroup1 = PostProcessGroup("_EBF");
+	extendedBilateralFilterGroup1.AddPostProcess(new ExtendedBilateralFilter(8.0f, 0.075f, 0.05f, 0.05f, 0.05f));
+	extendedBilateralFilterGroup1.AddPostProcess(new ModifiedReinhard());
+	extendedBilateralFilterGroup1.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&extendedBilateralFilterGroup1);
 
 	Scene scene(&camera);
 	
@@ -56,7 +45,7 @@ int main(int argc, char* argv[])
 	ConstMaterial greenWallMat; greenWallMat.albedo = { 86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f };
 	ConstMaterial whiteMat; whiteMat.albedo = { 1,1,1 };
 	ConstMaterial redWallMat; redWallMat.albedo = { 0.545f,0.0f,0.0f };
-	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 15.0f;
+	ConstMaterial yellowAreaLightMat; yellowAreaLightMat.albedo = { 1,214.0f / 255.0f,170.0f / 255.0f }; yellowAreaLightMat.emissiveStrength = 30.0f;
 	ConstMaterial whiteAreaLightMat; whiteAreaLightMat.albedo = { 1,1,1 }; whiteAreaLightMat.emissiveStrength = 20.0f;
 	ConstMaterial mintGreenMat; mintGreenMat.albedo = { 67.0f / 255.0f, 94.0f / 255.0f, 82.0f / 255.0f };
 	ConstMaterial blueMat; blueMat.albedo = { 16.0f / 255.0f, 32.0f / 255.0f, 75.0f / 255.0f };
@@ -68,11 +57,17 @@ int main(int argc, char* argv[])
 	PointLight pointLight = PointLight({ 1,1,1 }, 1, { 0, 0.65, 0 });
 	//scene.AddLight(&pointLight);
 
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 1.299, 0 });
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), { -0.5, 1.299, 0 });
 	transform = glm::rotate(transform, glm::radians(90.0f), { 1,0,0 });
-	RectLight rectLight = RectLight(transform, 0.25f, 0.25f, &yellowAreaLightMat);
-	scene.AddObject(&rectLight);
-	scene.AddLight(&rectLight);
+	RectLight rectLight1 = RectLight(transform, 0.1f, 0.1f, &yellowAreaLightMat);
+	scene.AddObject(&rectLight1);
+	scene.AddLight(&rectLight1);
+
+	transform = glm::translate(glm::mat4(1.0f), { 0.5, 1.299, 0 });
+	transform = glm::rotate(transform, glm::radians(90.0f), { 1,0,0 });
+	RectLight rectLight2 = RectLight(transform, 0.1f, 0.1f, &yellowAreaLightMat);
+	scene.AddObject(&rectLight2);
+	scene.AddLight(&rectLight2);
 
 	// Load the meshes for the scene
 	Mesh teapotMesh = Mesh("teapot.obj", 11);
@@ -109,7 +104,7 @@ int main(int argc, char* argv[])
 
 	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.3, -0.3 });
 	transform = glm::scale(transform, { 0.3,0.3,0.3 });
-	Sphere leftSphere = Sphere(transform, &whiteShinyMat);
+	Sphere leftSphere = Sphere(transform, &whiteMat);
 	scene.AddObject(&leftSphere);
 
 	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
@@ -120,8 +115,8 @@ int main(int argc, char* argv[])
 	transform = glm::translate(glm::mat4(1.0f), { 0.25,0.4,0.2 });
 	transform = glm::rotate(transform, glm::radians(-90.0f), { 1,0,0 });
 	transform = glm::scale(transform, { 0.025/3.0, 0.025/3.0, 0.025/3.0 });
-	MeshInstance teapot = MeshInstance(&teapotMesh, transform, &silverMat);
-	scene.AddObject(&teapot);
+	MeshInstance teapot = MeshInstance(&teapotMesh, transform, &whiteShinyMat);
+	//scene.AddObject(&teapot);
 
 
 	// Render and save the image. The image saves in the TestProgram folder (when I run the project that's where VS puts it at least)
@@ -132,7 +127,7 @@ int main(int argc, char* argv[])
 
 	time_t deltaTime = endTime - startTime;
 
-	scene.SaveScene("TestImage");
+	scene.SaveScene("Output\\image");
 
 	float hours = deltaTime / (60.0f * 60.0f);
 	int wholeHours = int(hours);

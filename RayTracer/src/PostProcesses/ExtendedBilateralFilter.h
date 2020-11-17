@@ -5,15 +5,15 @@
 
 namespace RayTracer
 {
-	class RT_API BilateralFilter : public PostProcess
+	class RT_API ExtendedBilateralFilter : public PostProcess
 	{
 	public:
-		BilateralFilter(float sigmaS, float sigmaR);
+		ExtendedBilateralFilter(float sigmaS, float sigmaR, float sigmaN, float sigmaA, float sigmaP);
 		void Apply(std::vector<std::vector<GBufferInfo>>* inputImage, std::vector<std::vector<GBufferInfo>>* outputImage, int width, int height);
 
 	private:
 		int m_size;
-		float m_sigmaS, m_sigmaR;
+		float m_sigmaS, m_sigmaR, m_sigmaN, m_sigmaA, m_sigmaP;
 		float** m_kernel;
 	};
 }
