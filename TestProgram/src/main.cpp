@@ -33,6 +33,18 @@ int main(int argc, char* argv[])
 	modifiedReinhardGCGroup.AddPostProcess(new GammaCorrection());
 	camera.AddPostProcessGroup(&modifiedReinhardGCGroup);
 
+	/*PostProcessGroup gaussianGroup = PostProcessGroup("_GB");
+	gaussianGroup.AddPostProcess(new GaussianBlur(8.0f));
+	gaussianGroup.AddPostProcess(new ModifiedReinhard());
+	gaussianGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&gaussianGroup);
+
+	PostProcessGroup bilateralFilterGroup = PostProcessGroup("_BF");
+	bilateralFilterGroup.AddPostProcess(new BilateralFilter(8.0f, 0.075f));
+	bilateralFilterGroup.AddPostProcess(new ModifiedReinhard());
+	bilateralFilterGroup.AddPostProcess(new GammaCorrection());
+	camera.AddPostProcessGroup(&bilateralFilterGroup);*/
+
 	PostProcessGroup extendedBilateralFilterGroup1 = PostProcessGroup("_EBF");
 	extendedBilateralFilterGroup1.AddPostProcess(new ExtendedBilateralFilter(8.0f, 0.075f, 0.05f, 0.05f, 0.05f));
 	extendedBilateralFilterGroup1.AddPostProcess(new ModifiedReinhard());

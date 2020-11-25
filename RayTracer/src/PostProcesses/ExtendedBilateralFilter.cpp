@@ -73,12 +73,10 @@ namespace RayTracer
 						colorWeights.b = RTMath::Gaussian(colorDifference.b, m_sigmaR);
 
 						// Calculate normal weights
-						glm::vec3 normalDifference = glm::abs((*inputImage)[y][x].normal - (*inputImage)[newY][newX].normal);
-						glm::vec3 normalWeights = { 0,0,0 };
+						float normalDifference = 1.0f - glm::dot((*inputImage)[y][x].normal, (*inputImage)[newY][newX].normal);
+						float normalWeight = 0.0f;
 
-						normalWeights.r = RTMath::Gaussian(normalDifference.r, m_sigmaN);
-						normalWeights.g = RTMath::Gaussian(normalDifference.g, m_sigmaN);
-						normalWeights.b = RTMath::Gaussian(normalDifference.b, m_sigmaN);
+						normalWeight = RTMath::Gaussian(normalDifference, m_sigmaN);
 
 						// Calculate albedo weights
 						glm::vec3 albedoDifference = glm::abs((*inputImage)[y][x].albedo - (*inputImage)[newY][newX].albedo);
@@ -97,7 +95,7 @@ namespace RayTracer
 						positionWeights.b = RTMath::Gaussian(positionDifference.b, m_sigmaP);
 
 						// Update normalization factor
-						glm::vec3 value = m_kernel[i][j] * colorWeights * normalWeights * albedoWeights * positionWeights;
+						glm::vec3 value = m_kernel[i][j] * colorWeights * normalWeight * albedoWeights * positionWeights;
 						normalization += value;
 
 						blurredColor += (*inputImage)[newY][newX].color * value;
