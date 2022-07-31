@@ -3,7 +3,7 @@
 #include<map>
 
 #include "Core.h"
-#include "Texture.h"
+//#include "Texture.h"
 
 namespace RayTracer
 {
@@ -11,12 +11,12 @@ namespace RayTracer
 	{
 	public:
 		static ResourceManager* Instance();
-		Texture* GetTexture(const char* textureFile);
+		//Texture* GetTexture(const char* textureFile);
 
 	private:
 		ResourceManager();
 
 		static ResourceManager* m_instance;
-		std::map <const char*, Texture*> m_textures;
+		//std::map <const char*, Texture*> m_textures;
 	};
 }

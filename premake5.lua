@@ -45,6 +45,10 @@ project "RayTracer"
 		"%{IncludeDir.tinyObj}"
 	}
 
+	filter "configurations:Release"
+		defines { "NDEBUG" }
+		optimize "On"
+
 project "TestProgram"
 	location "TestProgram"
 	kind "ConsoleApp"
@@ -72,3 +76,7 @@ project "TestProgram"
 	{
 		"RayTracer"
 	}
+
+	filter "configurations:Release"
+		defines { "NDEBUG" }
+		optimize "On"

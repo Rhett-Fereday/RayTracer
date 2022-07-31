@@ -15,7 +15,7 @@ namespace RayTracer
 		return ResourceManager::m_instance;
 	}
 
-	Texture* ResourceManager::GetTexture(const char * textureFile)
+	/*Texture* ResourceManager::GetTexture(const char * textureFile)
 	{
 		std::map<const char *, Texture*>::iterator it;
 
@@ -26,5 +26,5 @@ namespace RayTracer
 		Texture* texture = m_textures[textureFile] = new Texture(textureFile);
 
 		return texture;
-	}
+	}*/
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "Ray.h"
 
 namespace RayTracer
 {
@@ -19,9 +20,12 @@ namespace RayTracer
 			glm::vec3 v2, n2;
 		};
 
-		bool RayPlaneIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const float width, const float length, float &hitDistance);
-		bool RaySphereIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const float &radius, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
-		bool RayAABBIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const AABB& aabb, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
+		bool RayPlaneIntersection(const Ray& ray, const float width, const float length, float &hitDistance);
+		bool RaySphereIntersection(const Ray& ray, const float &radius, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
+		vec3 UniformSampleSphere(const vec2& u);
+		bool RayDiskIntersection(const Ray& ray, const float& radius, float &hitDistance);
+		vec2 ConcentricSampleDisk(const vec2& u);
+		bool RayAABBIntersection(const Ray& ray, const vec3& minDimensions, const vec3& maxDimensions, vec3 &hitNormal, float &hitDistance, bool &insideObject);
 		bool RayTriangleIntersection(const glm::vec3 &rayOrigin, const glm::vec3 &rayDirection, const Triangle &triangle, glm::vec3 &hitNormal, float &hitDistance, bool &insideObject);
 		bool TriangleAABBIntersection(const AABB& aabb, const Triangle &triangle);
 		float Fresnel(const glm::vec3 &incomingDirection, const glm::vec3 &normal, const float &refractiveIndex);

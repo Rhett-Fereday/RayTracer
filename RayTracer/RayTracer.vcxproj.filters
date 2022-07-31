@@ -1,130 +1,307 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Lights">
-      <UniqueIdentifier>{5066CDC0-3C08-F896-25C3-0BEB11047FE7}</UniqueIdentifier>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{CE7141AB-BA13-6C81-A3CE-7FD58F0FF3D1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Objects">
-      <UniqueIdentifier>{CF2649B1-3B06-C84C-441E-5323B07C2EAE}</UniqueIdentifier>
+    <Filter Include="Camera\ImageBuffers">
+      <UniqueIdentifier>{6D183B11-D979-181F-62E7-5ED1CE474FDE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PostProcesses">
-      <UniqueIdentifier>{42D5AA1C-AE95-2653-77D0-6FD0E34F6B2F}</UniqueIdentifier>
+    <Filter Include="Camera\Lenses">
+      <UniqueIdentifier>{87C8AC5E-F388-2895-BCC3-711228436D71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera\PostProcesses">
+      <UniqueIdentifier>{FA966744-E625-F10D-8F44-05097BB201B4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Integrators">
+      <UniqueIdentifier>{575A77B7-C30F-F0AC-4C04-EA83B8B8E6B0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interactions">
+      <UniqueIdentifier>{18BC3FB5-041F-CF59-ADA4-071099E69ADC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{67E8C255-D352-77CC-1C91-2872883A5521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderables">
+      <UniqueIdentifier>{CCBD2F02-3873-A8F7-C167-A2CE2D1C9FFB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderables\Geometry">
+      <UniqueIdentifier>{A7304F3F-93BF-D808-3CDE-EC03284CE9AE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderables\Lights">
+      <UniqueIdentifier>{4649CE90-322D-8FE6-9B8D-893987907968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleGenerators">
+      <UniqueIdentifier>{E12056D1-CD19-7523-F64B-5AA8E2A3542F}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BVH.h" />
-    <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\ConstMaterial.h" />
+    <ClInclude Include="src\Camera\Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\ImageBuffers\GBuffer.h">
+      <Filter>Camera\ImageBuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\ImageBuffers\HDRBuffer.h">
+      <Filter>Camera\ImageBuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\ImageBuffers\ImageBuffer.h">
+      <Filter>Camera\ImageBuffers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\Lenses\Lens.h">
+      <Filter>Camera\Lenses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\Lenses\PinholeLens.h">
+      <Filter>Camera\Lenses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\Lenses\ThinLens.h">
+      <Filter>Camera\Lenses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\GammaCorrection.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\ModifiedReinhard.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\NaiveReinhard.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\PostProcess.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\PostProcessGroup.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera\PostProcesses\VGEBF.h">
+      <Filter>Camera\PostProcesses</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\HitInfo.h" />
-    <ClInclude Include="src\Lights\AreaLight.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Integrators\DistributionTracer.h">
+      <Filter>Integrators</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\DirectionalLight.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Integrators\Integrator.h">
+      <Filter>Integrators</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\Light.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Integrators\PathTracer.h">
+      <Filter>Integrators</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\PointLight.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Integrators\RayCaster.h">
+      <Filter>Integrators</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\RectLight.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Integrators\RayTracer.h">
+      <Filter>Integrators</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lights\SpotLight.h">
-      <Filter>Lights</Filter>
+    <ClInclude Include="src\Interactions\Interaction.h">
+      <Filter>Interactions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\Objects\Box.h">
-      <Filter>Objects</Filter>
+    <ClInclude Include="src\Interactions\InteractionGeometry.h">
+      <Filter>Interactions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\Mesh.h">
-      <Filter>Objects</Filter>
+    <ClInclude Include="src\Interactions\MediumInteraction.h">
+      <Filter>Interactions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\MeshInstance.h">
-      <Filter>Objects</Filter>
+    <ClInclude Include="src\Interactions\SurfaceInteraction.h">
+      <Filter>Interactions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\Object.h">
-      <Filter>Objects</Filter>
+    <ClInclude Include="src\Materials\ConstantTexture.h">
+      <Filter>Materials</Filter>
     </ClInclude>
-    <ClInclude Include="src\Objects\Sphere.h">
-      <Filter>Objects</Filter>
+    <ClInclude Include="src\Materials\Material.h">
+      <Filter>Materials</Filter>
     </ClInclude>
-    <ClInclude Include="src\PostProcesses\GammaCorrection.h">
-      <Filter>PostProcesses</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PostProcesses\ModifiedReinhard.h">
-      <Filter>PostProcesses</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PostProcesses\NaiveReinhard.h">
-      <Filter>PostProcesses</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PostProcesses\PostProcess.h">
-      <Filter>PostProcesses</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PostProcesses\PostProcessGroup.h">
-      <Filter>PostProcesses</Filter>
+    <ClInclude Include="src\Materials\Texture.h">
+      <Filter>Materials</Filter>
     </ClInclude>
     <ClInclude Include="src\RTMath.h" />
+    <ClInclude Include="src\Ray.h" />
+    <ClInclude Include="src\Renderables\Geometry\BVH.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Box.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Disk.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Geometry.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\GeometryMesh.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Mesh.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\MeshInstance.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Object.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Plane.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Geometry\Sphere.h">
+      <Filter>Renderables\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\AreaLight.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\DirectionalLight.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\Light.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\PointLight.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\RectLight.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Lights\SpotLight.h">
+      <Filter>Renderables\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderables\Renderable.h">
+      <Filter>Renderables</Filter>
+    </ClInclude>
     <ClInclude Include="src\ResourceManager.h" />
+    <ClInclude Include="src\SampleGenerators\RandomGenerator.h">
+      <Filter>SampleGenerators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SampleGenerators\SampleGenerator.h">
+      <Filter>SampleGenerators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SampleGenerators\StratifiedGenerator.h">
+      <Filter>SampleGenerators</Filter>
+    </ClInclude>
     <ClInclude Include="src\Scene.h" />
-    <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BVH.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="src\Lights\AreaLight.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\Camera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\DirectionalLight.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\ImageBuffers\GBuffer.cpp">
+      <Filter>Camera\ImageBuffers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\Light.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\ImageBuffers\HDRBuffer.cpp">
+      <Filter>Camera\ImageBuffers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\PointLight.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\ImageBuffers\ImageBuffer.cpp">
+      <Filter>Camera\ImageBuffers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\RectLight.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\Lenses\Lens.cpp">
+      <Filter>Camera\Lenses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Lights\SpotLight.cpp">
-      <Filter>Lights</Filter>
+    <ClCompile Include="src\Camera\Lenses\PinholeLens.cpp">
+      <Filter>Camera\Lenses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\Objects\Box.cpp">
-      <Filter>Objects</Filter>
+    <ClCompile Include="src\Camera\Lenses\ThinLens.cpp">
+      <Filter>Camera\Lenses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Mesh.cpp">
-      <Filter>Objects</Filter>
+    <ClCompile Include="src\Camera\PostProcesses\GammaCorrection.cpp">
+      <Filter>Camera\PostProcesses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\MeshInstance.cpp">
-      <Filter>Objects</Filter>
+    <ClCompile Include="src\Camera\PostProcesses\ModifiedReinhard.cpp">
+      <Filter>Camera\PostProcesses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Object.cpp">
-      <Filter>Objects</Filter>
+    <ClCompile Include="src\Camera\PostProcesses\NaiveReinhard.cpp">
+      <Filter>Camera\PostProcesses</Filter>
     </ClCompile>
-    <ClCompile Include="src\Objects\Sphere.cpp">
-      <Filter>Objects</Filter>
+    <ClCompile Include="src\Camera\PostProcesses\PostProcessGroup.cpp">
+      <Filter>Camera\PostProcesses</Filter>
     </ClCompile>
-    <ClCompile Include="src\PostProcesses\GammaCorrection.cpp">
-      <Filter>PostProcesses</Filter>
+    <ClCompile Include="src\Camera\PostProcesses\VGEBF.cpp">
+      <Filter>Camera\PostProcesses</Filter>
     </ClCompile>
-    <ClCompile Include="src\PostProcesses\ModifiedReinhard.cpp">
-      <Filter>PostProcesses</Filter>
+    <ClCompile Include="src\Integrators\DistributionTracer.cpp">
+      <Filter>Integrators</Filter>
     </ClCompile>
-    <ClCompile Include="src\PostProcesses\NaiveReinhard.cpp">
-      <Filter>PostProcesses</Filter>
+    <ClCompile Include="src\Integrators\Integrator.cpp">
+      <Filter>Integrators</Filter>
     </ClCompile>
-    <ClCompile Include="src\PostProcesses\PostProcessGroup.cpp">
-      <Filter>PostProcesses</Filter>
+    <ClCompile Include="src\Integrators\PathTracer.cpp">
+      <Filter>Integrators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Integrators\RayCaster.cpp">
+      <Filter>Integrators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Integrators\RayTracer.cpp">
+      <Filter>Integrators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\ConstantTexture.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\Material.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Materials\Texture.cpp">
+      <Filter>Materials</Filter>
     </ClCompile>
     <ClCompile Include="src\RTMath.cpp" />
+    <ClCompile Include="src\Ray.cpp" />
+    <ClCompile Include="src\Renderables\Geometry\BVH.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Box.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Disk.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Geometry.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\GeometryMesh.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Mesh.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\MeshInstance.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Object.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Plane.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Geometry\Sphere.cpp">
+      <Filter>Renderables\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\AreaLight.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\DirectionalLight.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\Light.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\PointLight.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\RectLight.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Lights\SpotLight.cpp">
+      <Filter>Renderables\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderables\Renderable.cpp">
+      <Filter>Renderables</Filter>
+    </ClCompile>
     <ClCompile Include="src\ResourceManager.cpp" />
+    <ClCompile Include="src\SampleGenerators\RandomGenerator.cpp">
+      <Filter>SampleGenerators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SampleGenerators\SampleGenerator.cpp">
+      <Filter>SampleGenerators</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SampleGenerators\StratifiedGenerator.cpp">
+      <Filter>SampleGenerators</Filter>
+    </ClCompile>
     <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\TextureManager.cpp" />
   </ItemGroup>
 </Project>
