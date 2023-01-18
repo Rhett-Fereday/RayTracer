@@ -29,23 +29,19 @@ namespace RayTracer
 
 			if (areaLight)
 			{
-				//if (bounce == 0) L = areaLight->L(*interaction, -ray.direction);
-				L += Beta * areaLight->L(*interaction, -r.direction);
+				if (bounce == 0) L = areaLight->L(*interaction, -r.direction);
 
 				break;
 			}
 
-			/*L += interaction->material->GetAlbedo(0, 0)
-				* Beta
-				* UniformSampleAllLights(interaction, scene, generator, samplesPerLight, pixelSample);*/
-			/*L += Beta
-				* UniformSampleAllLights(interaction, scene, generator, samplesPerLight, pixelSample);*/
+			L += Beta
+				* UniformSampleOneLight(interaction, scene, generator, samplesPerLight, pixelSample);
 
 			// Sample new direction assuming all objects are Lambertian
 			// Calculate orthonormal basis from the normal
 			vec3 w = interaction->geometricNormal;
 			vec3 u = glm::normalize(vec3(w.z - w.y, w.x - w.z, w.y - w.x));
-			vec3 v = glm::cross(w, u);
+			vec3 v = glm::normalize(glm::cross(w, u));
 
 			// Generate two random floats in range [0,1]
 			float rand1 = generator->Generate1D();

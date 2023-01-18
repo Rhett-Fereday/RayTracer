@@ -15,7 +15,7 @@ namespace RayTracer
 		virtual vec3 SampleLi(const Interaction& interaction, const vec2& u, vec3& wi, float &pdf, float& sampleDistance) const override;
 		virtual float PdfLi(const Interaction& interaction, const vec3& wi) const override;
 
-		virtual vec3 Power() const override;
+		virtual float Power() const override;
 
 		shared_ptr<Geometry> geometry;
 	};

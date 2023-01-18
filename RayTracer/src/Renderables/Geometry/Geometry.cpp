@@ -31,9 +31,18 @@ namespace RayTracer
 		return true;
 	}
 
-	SurfaceInteraction Geometry::Sample(const Interaction& interaction, const vec2& u) const
+	SurfaceInteraction Geometry::Sample(const Interaction& interaction, const vec2& u, float& pdf) const
 	{
-		return this->Sample(u);
+		auto geomInteraction = this->Sample(u);
+		pdf = Pdf(geomInteraction);
+
+		vec3 wi = glm::normalize(geomInteraction.p - interaction.p);
+
+		auto distance = glm::distance(geomInteraction.p, interaction.p);
+
+		pdf *= (distance * distance) / glm::abs(glm::dot(geomInteraction.geometricNormal, -wi));
+
+		return geomInteraction;
 	}
 
 	float Geometry::Pdf(const Interaction& interaction) const

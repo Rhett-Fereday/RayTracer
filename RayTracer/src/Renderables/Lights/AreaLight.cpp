@@ -16,11 +16,10 @@ namespace RayTracer
 
 	vec3 AreaLight::SampleLi(const Interaction& interaction, const vec2& u, vec3& wi, float& pdf, float& sampleDistance) const
 	{
-		auto lightInteraction = geometry->Sample(interaction, u);
+		auto lightInteraction = geometry->Sample(interaction, u, pdf);
 
 		wi = glm::normalize(lightInteraction.p - interaction.p);
 		sampleDistance = glm::distance(lightInteraction.p, interaction.p);
-		pdf = geometry->Pdf(interaction);
 
 		return L(lightInteraction, -wi);
 	}
@@ -30,8 +29,8 @@ namespace RayTracer
 		return geometry->Pdf(interaction, wi);
 	}
 
-	vec3 AreaLight::Power() const
+	float AreaLight::Power() const
 	{
-		return intensity * color * geometry->Area();
+		return intensity * geometry->Area();
 	}
 }

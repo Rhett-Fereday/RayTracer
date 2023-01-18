@@ -27,4 +27,4 @@ const float pi = glm::pi<float>();
 const float invPi = 1.0f / pi;
 const float piOver2 = pi / 2.0f;
 const float piOver4 = pi / 4.0f;
-const float epsilon = 1e-3;
+const float epsilon = 1e-5;

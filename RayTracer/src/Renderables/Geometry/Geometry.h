@@ -16,7 +16,7 @@ namespace RayTracer
 		bool Intersects(const Ray& ray, float& tHit, shared_ptr<SurfaceInteraction> interaction) const;
 		
 		virtual SurfaceInteraction Sample(const vec2& u) const = 0;
-		virtual SurfaceInteraction Sample(const Interaction& interaction, const vec2& u) const;		
+		virtual SurfaceInteraction Sample(const Interaction& interaction, const vec2& u, float& pdf) const;		
 
 		virtual float Pdf(const Interaction& interaction) const;
 		virtual float Pdf(const Interaction& interaction, const vec3& wi) const;

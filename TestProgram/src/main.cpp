@@ -28,6 +28,7 @@ using namespace RayTracer;
 enum RenderScene
 {
 	CORNELL_BOX,
+	MANY_LIGHT_CORNELL,
 	PARKING_GARAGE
 };
 
@@ -51,7 +52,7 @@ enum GeneratorType
 
 void RenderCornellBox(shared_ptr<Lens> lens, IntegratorType integratorType, 
 	GeneratorType generatorType, unsigned int samplesPerPixel, 
-	unsigned int imageWidth, unsigned int imageHeight)
+	unsigned int imageWidth, unsigned int imageHeight, int numThreads)
 {
 	auto scene = make_shared<Scene>();
 
@@ -126,7 +127,7 @@ void RenderCornellBox(shared_ptr<Lens> lens, IntegratorType integratorType,
 	transform = glm::translate(vec3(0, 1.299f, 0));
 	transform = glm::rotate(transform, glm::radians(90.0f), vec3(1,0,0));
 	//transform = glm::translate(vec3(0, 1.199f, 0));
-	auto lightGeom = make_shared<Plane>(transform, 0.25f); //make_shared<Sphere>(0.1, transform);
+	auto lightGeom = make_shared<Plane>(transform, .25f); //make_shared<Sphere>(0.1, transform);
 	auto light = make_shared<AreaLight>(transform, lightGeom, vec3(1, 214.0f / 255.0f, 170.0f / 255.0f), 60.f, 1);
 	scene->AddLight(light);
 
@@ -160,14 +161,146 @@ void RenderCornellBox(shared_ptr<Lens> lens, IntegratorType integratorType,
 		break;
 	}	
 
-	integrator->Render(scene, camera, generator);
+	integrator->Render(scene, camera, generator, numThreads);
 
 	camera->SaveImage("CornellBox");
 }
 
+void RenderManyLightCornell(shared_ptr<Lens> lens, IntegratorType integratorType,
+	GeneratorType generatorType, unsigned int samplesPerPixel,
+	unsigned int imageWidth, unsigned int imageHeight, int numThreads)
+{
+	auto scene = make_shared<Scene>();
+
+	// Create the materials needed
+	auto redMat = make_shared<Material>(make_shared<ConstantTexture>(vec3(0.545f, 0.0f, 0.0f)));
+	auto whiteMat = make_shared<Material>(make_shared<ConstantTexture>(vec3(1)));
+	auto greenMat = make_shared<Material>(make_shared<ConstantTexture>(vec3(86.0f / 255.0f, 125.0f / 255.0f, 70.0f / 255.0f)));
+
+	// Add the floor to the scene
+	mat4 transform = glm::translate(vec3(0, 0, 0));
+	transform = glm::rotate(transform, glm::radians(-90.0f), vec3(1, 0, 0));
+	auto floorGeom = make_shared<Plane>(transform, 4.0f);
+	auto floor = make_shared<Renderable>(floorGeom, whiteMat);
+	scene->AddRenderable(floor);
+
+	// Add the back wall to the scene
+	transform = glm::translate(vec3(0, 0.3, -0.75));
+	auto backWallGeom = make_shared<Plane>(transform, 2.0f);
+	auto backWall = make_shared<Renderable>(backWallGeom, whiteMat);
+	scene->AddRenderable(backWall);
+
+	// Add the front wall (behind camera)
+	transform = glm::translate(vec3(0, 0.3, 2));
+	transform = glm::rotate(transform, glm::radians(180.0f), vec3(0, 1, 0));
+	auto frontWallGeom = make_shared<Plane>(transform, 2.0f);
+	auto frontWall = make_shared<Renderable>(frontWallGeom, whiteMat);
+	scene->AddRenderable(frontWall);
+
+	// Add left wall to the scene
+	transform = glm::translate(vec3(-0.75, -0.7, 0));
+	transform = glm::rotate(transform, glm::radians(90.0f), vec3(0, 1, 0));
+	auto leftWallGeom = make_shared<Plane>(transform, 4.0f);
+	auto leftWall = make_shared<Renderable>(leftWallGeom, redMat);
+	scene->AddRenderable(leftWall);
+
+	// Add right wall to the scene
+	transform = glm::translate(vec3(0.75, -0.7, 0));
+	transform = glm::rotate(transform, glm::radians(-90.0f), vec3(0, 1, 0));
+	auto rightWallGeom = make_shared<Plane>(transform, 4.0f);
+	auto rightWall = make_shared<Renderable>(rightWallGeom, greenMat);
+	scene->AddRenderable(rightWall);
+
+	// Add the ceiling to the scene
+	transform = glm::translate(vec3(0, 1.3, 0));
+	transform = glm::rotate(transform, glm::radians(90.0f), vec3(1, 0, 0));
+	auto ceilingGeom = make_shared<Plane>(transform, 2.0f);
+	auto ceiling = make_shared<Renderable>(ceilingGeom, whiteMat);
+	scene->AddRenderable(ceiling);
+
+	// Add the left box to the scene
+	transform = glm::translate(glm::mat4(1.0f), { -0.3, 0.4, -0.3 });
+	transform = glm::rotate(transform, glm::radians(20.0f), { 0,1,0 });
+	auto boxGeom = make_shared<Box>(transform, vec3(0.4, 0.8, 0.4));
+	auto leftBox = make_shared<Renderable>(boxGeom, whiteMat);
+	scene->AddRenderable(leftBox);
+
+	// Add the right box to the scene
+	transform = glm::translate(glm::mat4(1.0f), { 0.25, 0.2, 0.2 });
+	transform = glm::rotate(transform, glm::radians(-20.0f), { 0,1,0 });
+	boxGeom = make_shared<Box>(transform, vec3(0.4, 0.4, 0.4));
+	auto rightBox = make_shared<Renderable>(boxGeom, whiteMat);
+	scene->AddRenderable(rightBox);
+
+	CameraSettings settings;
+	settings.samplesPerPixel = samplesPerPixel;
+	settings.imageWidth = imageWidth;
+	settings.imageHeight = imageHeight;
+	settings.position = { 0, 0.65, 1.99 };
+	settings.lookAt = { 0, 0.65, 0 };
+	settings.fov = 45.0f;
+
+	auto camera = make_shared<Camera>(lens, settings);
+
+	shared_ptr<Integrator> integrator;
+	switch (integratorType)
+	{
+	case IntegratorType::PATH_TRACER:
+		integrator = make_shared<PathTracer>(4);
+		break;
+
+	default:
+		integrator = make_shared<RayCaster>();
+		break;
+	}
+
+	shared_ptr<SampleGenerator> generator;
+	switch (generatorType)
+	{
+	default:
+		generator = make_shared<StratifiedGenerator>();
+		break;
+	}
+
+	// Add the lights to the scene
+	int lightsX = 6;
+	int lightsZ = 6;
+	double minRadius = 0.02;
+	double maxRadius = 0.02;	
+	
+	double gridStepX = 1.5 / static_cast<double>(lightsX);
+	double gridStepY = 1.5 / static_cast<double>(lightsZ);
+
+	double maxLuminance = 15.0;
+	double minLuminance = 12.0;
+	double minY = 1.25;
+	double maxY = 1.27;
+
+	for (int i = 0; i < lightsX; i++)
+	{
+		for (int j = 0; j < lightsZ; j++)
+		{
+			double radius = minRadius + generator->Generate1D() * (maxRadius - minRadius);
+			double luminance = minLuminance + generator->Generate1D() * (maxLuminance - minLuminance);
+			double x = static_cast<double>(i) * gridStepX + gridStepX/2.0 - 0.75;
+			double y = minY + generator->Generate1D() * (maxY - minY);
+			double z = static_cast<double>(j) * gridStepY + gridStepY/2.0 - 0.75;
+
+			transform = glm::translate(vec3(x, y, z));
+			auto lightGeom = make_shared<Sphere>(radius, transform);
+			auto light = make_shared<AreaLight>(transform, lightGeom, vec3(1, 214.0f / 255.0f, 170.0f / 255.0f), luminance, 1);
+			scene->AddLight(light);
+		}
+	}
+
+	integrator->Render(scene, camera, generator, numThreads);
+
+	camera->SaveImage("ManyLightCornell");
+}
+
 void RenderParkingGarage(shared_ptr<Lens> lens, IntegratorType integratorType,
 	GeneratorType generatorType, unsigned int samplesPerPixel,
-	unsigned int imageWidth, unsigned int imageHeight)
+	unsigned int imageWidth, unsigned int imageHeight, int numThreads)
 {
 	auto scene = make_shared<Scene>(vec3(1));
 
@@ -225,20 +358,21 @@ void RenderParkingGarage(shared_ptr<Lens> lens, IntegratorType integratorType,
 		break;
 	}
 
-	integrator->Render(scene, camera, generator);
+	integrator->Render(scene, camera, generator, numThreads);
 
 	camera->SaveImage("ParkingGarage");
 }
 
 int main(int argc, char* argv[])
 {
-	auto sceneToRender = RenderScene::PARKING_GARAGE;
+	auto sceneToRender = RenderScene::MANY_LIGHT_CORNELL;
 	auto lensToUse = CameraLens::PINHOLE_LENS;
 	auto integratorToUse = IntegratorType::PATH_TRACER;
 	auto generatorToUse = GeneratorType::STRATIFIED_GENERATOR;
-	unsigned int samplesPerPixel = 4;
-	unsigned int imageWidth = 500;
-	unsigned int imageHeight = 500;
+	unsigned int numThreads = std::thread::hardware_concurrency() - 1;
+	unsigned int samplesPerPixel = 36;
+	unsigned int imageWidth = 640;
+	unsigned int imageHeight = 480;
 
 	shared_ptr<Lens> lens;
 
@@ -256,12 +390,16 @@ int main(int argc, char* argv[])
 
 	switch (sceneToRender)
 	{
+	case RenderScene::MANY_LIGHT_CORNELL:
+		RenderManyLightCornell(lens, integratorToUse, generatorToUse, samplesPerPixel, imageWidth, imageHeight, numThreads);
+		break;
+
 	case RenderScene::PARKING_GARAGE:
-		RenderParkingGarage(lens, integratorToUse, generatorToUse, samplesPerPixel, imageWidth, imageHeight);
+		RenderParkingGarage(lens, integratorToUse, generatorToUse, samplesPerPixel, imageWidth, imageHeight, numThreads);
 		break;
 
 	default:
-		RenderCornellBox(lens, integratorToUse, generatorToUse, samplesPerPixel, imageWidth, imageHeight);
+		RenderCornellBox(lens, integratorToUse, generatorToUse, samplesPerPixel, imageWidth, imageHeight, numThreads);
 		break;
 	}
 

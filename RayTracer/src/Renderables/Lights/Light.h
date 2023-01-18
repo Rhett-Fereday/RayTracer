@@ -17,7 +17,8 @@ namespace RayTracer
 		virtual vec3 SampleLi(const Interaction& interaction, const vec2& u, vec3& wi, float &pdf, float& sampleDistance) const = 0;
 		virtual float PdfLi(const Interaction& interaction, const vec3& wi) const = 0;
 
-		virtual vec3 Power() const = 0;
+		virtual float Power() const = 0;
+		inline vec3 Position() const { return position; };
 
 		inline int NumSamples() const { return nSamples; };
 
@@ -26,5 +27,6 @@ namespace RayTracer
 		vec3 color;
 		float intensity;
 		int nSamples;
+		vec3 position;
 	};
 }
